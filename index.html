@@ -545,6 +545,41 @@ const COMPANIES = [
   // Wallet
   { name:"Backpack (xNFT)",  org:"coral-xyz",                cat:"Wallet",     icon:"🎒", repos:["backpack","xnft-quickstart"] },
   { name:"Solflare",         org:"solflare-wallet",          cat:"Wallet",     icon:"🌟", repos:[] },
+  // Infrastructure / RPC
+  { name:"Jump Crypto",      org:"jump-crypto",              cat:"Infrastructure", icon:"🦘", repos:[] },
+  { name:"Syndica",          org:"syndica-io",               cat:"Infrastructure", icon:"📡", repos:[] },
+  { name:"QuickNode",        org:"quiknode-labs",            cat:"Infrastructure", icon:"⚡", repos:[] },
+  { name:"Chainlink",        org:"smartcontractkit",         cat:"Infrastructure", icon:"🔗", repos:["chainlink"] },
+  { name:"Neon EVM",         org:"neonlabsorg",              cat:"Infrastructure", icon:"🟢", repos:["neon-evm"] },
+  { name:"Solayer",          org:"solayer-labs",             cat:"Infrastructure", icon:"🔄", repos:[] },
+  { name:"Dialect",          org:"dialectlabs",              cat:"Infrastructure", icon:"💬", repos:["blinks","sdk"] },
+  { name:"Civic",            org:"civicteam",                cat:"Infrastructure", icon:"🪪", repos:[] },
+  { name:"Squads Protocol",  org:"Squads-Protocol",          cat:"Infrastructure", icon:"🔐", repos:[] },
+  // DeFi — new additions
+  { name:"Meteora",          org:"MeteoraAg",                cat:"DeFi",       icon:"🌦", repos:["meteora-dynamic-amm-sdk","dlmm-sdk"] },
+  { name:"Zeta Markets",     org:"zetamarkets",              cat:"DeFi",       icon:"Ζ",  repos:["zeta-sdk"] },
+  { name:"Bonfida",          org:"Bonfida",                  cat:"DeFi",       icon:"🅱",  repos:["spl-name-service"] },
+  { name:"Streamflow",       org:"streamflow-finance",       cat:"DeFi",       icon:"🌊", repos:["timelock"] },
+  { name:"Step Finance",     org:"step-finance",             cat:"DeFi",       icon:"🪜", repos:[] },
+  { name:"DFlow",            org:"dflowprotocol",            cat:"DeFi",       icon:"🌀", repos:[] },
+  { name:"Cube Exchange",    org:"cubexch",                  cat:"DeFi",       icon:"⬛", repos:[] },
+  { name:"Rate-X",           org:"ratex-protocol",           cat:"DeFi",       icon:"📉", repos:[] },
+  { name:"Exponent Finance", org:"exponent-fi",              cat:"DeFi",       icon:"🧮", repos:[] },
+  { name:"Mango Markets",    org:"blockworks-foundation",    cat:"DeFi",       icon:"🥭", repos:["mango-v4","mango-feeds"] },
+  { name:"Loopscale",        org:"loopscale",                cat:"DeFi",       icon:"🔁", repos:[] },
+  { name:"Kamino Finance",   org:"kamino-finance",           cat:"DeFi",       icon:"🌐", repos:[] },
+  // NFT — new additions
+  { name:"Magic Eden",       org:"magiceden-oss",            cat:"NFT",        icon:"🪄", repos:[] },
+  // Governance
+  { name:"MetaDAO",          org:"metaDAOproject",           cat:"Governance", icon:"🗳", repos:[] },
+  // Payments / Launchpad
+  { name:"Pump.fun",         org:"pump-fun",                 cat:"Payments",   icon:"🚀", repos:[] },
+  { name:"TipLink / Fin",    org:"tiplink",                  cat:"Payments",   icon:"💸", repos:[] },
+  { name:"Sphere",           org:"sphere-labs",              cat:"Payments",   icon:"🌐", repos:[] },
+  { name:"Coinflow",         org:"coinflow-labs",            cat:"Payments",   icon:"💳", repos:[] },
+  { name:"MoonPay",          org:"moonpay",                  cat:"Payments",   icon:"🌙", repos:[] },
+  { name:"Moonshot",         org:"moonshot-labs",            cat:"Payments",   icon:"🌕", repos:[] },
+  { name:"Axiom",            org:"axiom-crypto",             cat:"Payments",   icon:"📐", repos:[] },
 ];
 
 const AI_ARCHETYPES = [
@@ -593,11 +628,15 @@ const PROGRAM_TYPES = [
       // Infrastructure
       "heliuslabs/helius-sdk","clockwork-xyz/clockwork","switchboard-xyz/switchboard-solana",
       // Payments / Governance
-      "solana-labs/solana-pay","solana-labs/governance-ui",
+      "solana-labs/solana-pay","solana-labs/governance-ui","metaDAOproject/metadao",
       // Stablecoins
       "hubbleprotocol/hubble-protocol",
       // Tooling
       "coral-xyz/backpack","jito-foundation/jito-solana",
+      // New ecosystem additions
+      "MeteoraAg/meteora-dynamic-amm-sdk","Squads-Protocol/v4",
+      "solayer-labs/solayer-core","streamflow-finance/timelock",
+      "neonlabsorg/neon-evm","zetamarkets/zeta-sdk",
   ]},
   { name:"DEX / AMM", icon:"🔄", desc:"Decentralized exchanges and automated market makers",
     repos:["orca-so/whirlpools","orca-so/orca-sdks","raydium-io/raydium-clmm","raydium-io/raydium-amm","raydium-io/raydium-frontend","openbook-dex/openbook-program","openbook-dex/openbook-ts","Ellipsis-Labs/phoenix-v1","Ellipsis-Labs/phoenix-sdk","project-serum/serum-dex","saber-hq/saber-periphery","saber-hq/stable-swap","mercurial-finance/mercurial-dynamic-amm-sdk"] },
@@ -626,7 +665,7 @@ const PROGRAM_TYPES = [
   { name:"Governance / DAO", icon:"🗳", desc:"On-chain governance, DAO tooling and voting programs",
     repos:["solana-labs/governance-ui","blockworks-foundation/voter-stake-registry","marinade-finance/governance-rewards"] },
   { name:"Payments", icon:"💳", desc:"Payments, commerce and point-of-sale programs on Solana",
-    repos:["solana-labs/solana-pay"] },
+    repos:["solana-labs/solana-pay","tiplink/tiplink-open-source","sphere-labs/sphere","coinflow-labs/coinflow-client"] },
   { name:"Stablecoins", icon:"💵", desc:"On-chain stablecoin protocols and synthetic asset programs",
     repos:["UXDProtocol/uxd-program","hubbleprotocol/hubble-protocol"] },
   { name:"Token / SPL", icon:"🪙", desc:"SPL token programs, token extensions (Token-2022) and standards",
@@ -634,7 +673,21 @@ const PROGRAM_TYPES = [
   { name:"Automation / CRON", icon:"⏱", desc:"On-chain automation, cron jobs and scheduled transactions",
     repos:["clockwork-xyz/clockwork"] },
   { name:"RPC / Infrastructure", icon:"🔧", desc:"RPC nodes, indexers, streaming APIs and dev infrastructure",
-    repos:["heliuslabs/helius-sdk","heliuslabs/helius-rpc","switchboard-xyz/switchboard-core","triton-one/yellowstone-grpc","GenesysGo/shadow-drive"] },
+    repos:["heliuslabs/helius-sdk","heliuslabs/helius-rpc","switchboard-xyz/switchboard-core","triton-one/yellowstone-grpc","GenesysGo/shadow-drive","syndica-io/chainsaw","quiknode-labs/qn-guide-examples"] },
+  { name:"Restaking", icon:"🔄", desc:"Liquid restaking protocols and restaked SOL derivatives",
+    repos:["solayer-labs/solayer-core","jito-foundation/jito-programs"] },
+  { name:"Launchpad / Memecoins", icon:"🚀", desc:"Token launchpads, memecoin platforms and fair-launch protocols",
+    repos:["pump-fun/pump-interface","moonshot-labs/moonshot"] },
+  { name:"Liquidity / DLMM", icon:"🌊", desc:"Dynamic liquidity market makers and concentrated liquidity protocols",
+    repos:["MeteoraAg/meteora-dynamic-amm-sdk","MeteoraAg/dlmm-sdk","orca-so/whirlpools"] },
+  { name:"Multisig / Security", icon:"🔐", desc:"Multi-signature wallets, program security and access control",
+    repos:["Squads-Protocol/v4","Squads-Protocol/squads-mpl"] },
+  { name:"Token Vesting", icon:"🌊", desc:"Token streaming, vesting schedules and payroll protocols",
+    repos:["streamflow-finance/timelock","streamflow-finance/streamflow-sdk"] },
+  { name:"Identity / KYC", icon:"🪪", desc:"On-chain identity, credentials and KYC protocols",
+    repos:["civicteam/civic-link","Bonfida/spl-name-service","dialectlabs/blinks"] },
+  { name:"EVM Compatibility", icon:"🟢", desc:"EVM emulation and Ethereum compatibility layers on Solana",
+    repos:["neonlabsorg/neon-evm","neonlabsorg/neon-proxy.py"] },
 ];
 
 const SIGNAL_KEYWORDS = {
@@ -656,6 +709,10 @@ const SOL_COMPANY_NAMES = [
   "solana","anza","firedancer","jump","metaplex","coral","jito","pyth","wormhole",
   "orca","raydium","jupiter","drift","margfi","marginfi","marinade","solend","sanctum",
   "helius","switchboard","clockwork","tensor","magicblock","openbook","kamino","hubble",
+  "meteora","zeta","bonfida","mango","streamflow","squads","solayer","dialect","civic",
+  "neon","tiplink","sphere","coinflow","moonpay","pump","moonshot","axiom","cube",
+  "ratex","exponent","dflow","syndica","quicknode","chainlink","crossmint","metadao",
+  "loopscale","step","magiceden",
 ];
 
 // ==========================================================================
@@ -867,7 +924,7 @@ async function runSearch(repoPaths, sourceLabel) {
 // COMPANIES MODE
 // ==========================================================================
 
-const CATS = ['All','Foundation','DeFi','NFT','Infrastructure','Tooling','Gaming','Wallet'];
+const CATS = ['All','Foundation','DeFi','NFT','Infrastructure','Tooling','Gaming','Wallet','Governance','Payments'];
 let activeCat = 'All';
 
 function renderCompanies() {
