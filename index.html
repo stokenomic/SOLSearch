@@ -883,7 +883,14 @@ async function runSearch(repoPaths, sourceLabel) {
       setProgress(`Loading ${rp} (${i+1}/${repoPaths.length})…`);
       let contributors;
       try { contributors = await fetchContributors(owner, repo); }
-      catch(e) { continue; }
+      catch(e) {
+        if (e.message && e.message.includes('Rate limit')) {
+          showLoading(false);
+          showToast('Rate limit exceeded — add a GitHub token (🔑) for 5,000 req/hr');
+          return;
+        }
+        continue;
+      }
       for (const c of contributors) {
         if (!contribMap[c.login]) contribMap[c.login] = { login: c.login, contributions: 0, sourceRepo: rp };
         contribMap[c.login].contributions += c.contributions;
