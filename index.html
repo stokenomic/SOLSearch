@@ -194,6 +194,8 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
   padding:8px 14px; border-radius:8px; background:var(--card);
   border:1px solid var(--border); font-size:12px; color:var(--t2);
 }
+.summary-stat.clickable { cursor:pointer; transition:border-color 0.2s; }
+.summary-stat.clickable:hover { border-color:var(--green); background:rgba(20,241,149,0.05); }
 .summary-stat .sv { font-weight:700; color:var(--t1); margin-right:4px; }
 .summary-stat .sv.green { color:var(--green); }
 .summary-stat .sv.purple { color:var(--purple); }
@@ -237,7 +239,7 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
 .dev-card {
   border-radius:var(--radius); background:var(--card);
   border:1px solid var(--border); overflow:hidden; transition:all 0.2s;
-  display:flex; flex-direction:column;
+  display:flex; flex-direction:column; cursor:pointer;
 }
 .dev-card:hover { border-color:rgba(153,69,255,0.45); background:var(--card2); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
 .dev-card.saved { border-color:rgba(20,241,149,0.35); }
@@ -363,7 +365,21 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
   background:var(--bg2); border:1px solid var(--border); color:var(--t1); outline:none;
   min-height:180px;
 }
-.modal-actions { display:flex; gap:8px; margin-top:12px; }
+.recruiter-ctx { margin-bottom:14px; border:1px solid var(--border); border-radius:8px; background:var(--bg2); overflow:hidden; }
+.recruiter-ctx-header { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; cursor:pointer; transition:background 0.2s; }
+.recruiter-ctx-header:hover { background:rgba(153,69,255,0.05); }
+.recruiter-ctx-toggle { font-size:12px; color:var(--t3); transition:transform 0.2s; }
+.recruiter-ctx-toggle.collapsed { transform:rotate(-90deg); }
+.recruiter-ctx-body { padding:0 14px 12px; display:flex; flex-direction:column; gap:8px; }
+.recruiter-ctx-body.collapsed { display:none; }
+.recruiter-input { width:100%; padding:8px 12px; border-radius:7px; font-size:12px; background:var(--card); border:1px solid var(--border); color:var(--t1); outline:none; transition:border-color 0.2s; }
+.recruiter-input:focus { border-color:var(--purple); }
+.recruiter-ctx-summary { font-size:11px; color:var(--t2); padding:0 14px 10px; }
+.archetype-label { display:inline-flex; align-items:center; gap:5px; font-size:11px; color:var(--green); background:rgba(20,241,149,0.08); border:1px solid rgba(20,241,149,0.2); border-radius:12px; padding:3px 10px; margin-bottom:10px; }
+.char-counter { font-size:11px; text-align:right; margin-top:4px; color:var(--t3); }
+.char-counter.warn { color:#f59e0b; }
+.char-counter.over { color:#ef4444; }
+.modal-actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
 .token-input {
   width:100%; padding:10px 14px; border-radius:8px; font-size:13px;
   background:var(--bg2); border:1px solid var(--border); color:var(--t1); outline:none;
@@ -732,6 +748,50 @@ const SOL_COMPANY_NAMES = [
   "loopscale","step","magiceden","igneous","ellipsis","blockworks","cardinal",
 ];
 
+const SIGNAL_DESCRIPTIONS = {
+  SOL:'Solana ecosystem development', RUST:'Rust systems programming',
+  ANCHOR:'Anchor on-chain development', SPL:'SPL token program expertise',
+  METAPLEX:'Metaplex / NFT standards', DEFI:'DeFi protocol engineering',
+  NFT:'NFT and digital collectibles', ZK:'zero-knowledge cryptography',
+  TS:'TypeScript / frontend development', PYTHON:'Python tooling',
+  VALIDATOR:'validator infrastructure and consensus', WEB3:'Web3 development',
+};
+
+const OUTREACH_ARCHETYPES = [
+  { id:'validator', label:'Validator / Core Engineer',
+    match: s => s.includes('VALIDATOR') || (s.includes('RUST') && s.includes('SOL') && !s.includes('DEFI') && !s.includes('NFT')),
+    pitchAngle:'low-level systems engineering, performance optimization, and consensus mechanics',
+    hooks:['validator expertise is incredibly rare','core protocol engineers are the backbone of Solana'] },
+  { id:'zk', label:'ZK / Privacy Researcher',
+    match: s => s.includes('ZK'),
+    pitchAngle:'zero-knowledge proof systems and privacy-preserving computation on Solana',
+    hooks:['ZK expertise on Solana is extraordinarily rare','the intersection of ZK and Solana is a frontier'] },
+  { id:'anchor', label:'Anchor Program Developer',
+    match: s => s.includes('ANCHOR'),
+    pitchAngle:'on-chain Rust program architecture and Anchor framework mastery',
+    hooks:['strong Anchor developers are in huge demand','on-chain program expertise sets you apart'] },
+  { id:'defi', label:'DeFi Protocol Engineer',
+    match: s => s.includes('DEFI'),
+    pitchAngle:'DeFi protocol design, liquidity mechanisms, and financial primitives on Solana',
+    hooks:['DeFi engineering on Solana is a rare and valuable skill','your protocol-level thinking is exactly what we need'] },
+  { id:'nft', label:'NFT / Metaplex Developer',
+    match: s => s.includes('NFT') || s.includes('METAPLEX'),
+    pitchAngle:'NFT standards, token metadata, and digital asset infrastructure',
+    hooks:['Metaplex expertise is hard to find','your NFT infrastructure experience is valuable'] },
+  { id:'frontend', label:'Solana Frontend Developer',
+    match: s => s.includes('TS') && s.includes('SOL'),
+    pitchAngle:'TypeScript-based dApp development and wallet integration on Solana',
+    hooks:['great Solana frontend devs bridge the gap between protocol and user','dApp UX is a critical differentiator'] },
+  { id:'infra', label:'Infrastructure / Tooling Engineer',
+    match: s => s.includes('SOL') && (s.includes('RUST') || s.includes('PYTHON')),
+    pitchAngle:'Solana infrastructure, tooling, and developer experience',
+    hooks:['infrastructure engineers make the entire ecosystem more productive','dev tooling is underinvested with huge impact'] },
+  { id:'generalist', label:'Solana Developer',
+    match: () => true,
+    pitchAngle:'Solana ecosystem development and blockchain engineering',
+    hooks:['your Solana experience stands out','blockchain engineers with your background are in demand'] },
+];
+
 // ==========================================================================
 // STATE
 // ==========================================================================
@@ -823,6 +883,17 @@ function detectSignals(user) {
   // Always add SOL if any known company
   if (!found.includes('SOL') && SOL_COMPANY_NAMES.some(n => text.includes(n))) found.push('SOL');
   return found;
+}
+
+function detectOutreachArchetype(signals) {
+  return OUTREACH_ARCHETYPES.find(a => a.match(signals)) || OUTREACH_ARCHETYPES[OUTREACH_ARCHETYPES.length - 1];
+}
+
+function buildSmartSkillString(signals) {
+  const priority = ['VALIDATOR','ZK','ANCHOR','DEFI','NFT','METAPLEX','RUST','SPL','PYTHON','TS'];
+  const relevant = priority.filter(s => signals.includes(s)).slice(0, 3);
+  if (!relevant.length) return 'Solana development';
+  return relevant.map(s => SIGNAL_DESCRIPTIONS[s]).join(', ');
 }
 
 function calcScore(user, contributions) {
@@ -1357,8 +1428,8 @@ function renderSummary() {
 
   el.innerHTML = `
     <div class="summary-stat"><span class="sv purple">${avgScore}</span> avg score</div>
-    <div class="summary-stat"><span class="sv green">${emailPct}%</span> have email (${withEmail})</div>
-    <div class="summary-stat"><span class="sv green">${activePct}%</span> active 90d (${active90})</div>
+    <div class="summary-stat clickable" onclick="document.getElementById('fEmail').checked=!document.getElementById('fEmail').checked;applyFilters()"><span class="sv green">${emailPct}%</span> have email (${withEmail})</div>
+    <div class="summary-stat clickable" onclick="document.getElementById('fActive').checked=!document.getElementById('fActive').checked;applyFilters()"><span class="sv green">${activePct}%</span> active 90d (${active90})</div>
     ${topSigs.length ? `<div class="summary-stat">Top: ${topSigs.map(([s,c]) => `<span class="badge badge-${s}" style="margin-left:4px">${s}</span>`).join('')}</div>` : ''}
     ${topLoc.length ? `<div class="summary-stat">📍 ${topLoc.map(([l,c]) => `${esc(l)} (${c})`).join(', ')}</div>` : ''}
   `;
@@ -1384,7 +1455,7 @@ function renderCard(d) {
   ).join('');
 
   return `<div class="dev-card${isSaved?' saved':''}" id="dc-${d.login}">
-    <div class="card-header">
+    <div class="card-header" onclick="openProfileModal('${d.login}')">
       <img class="avatar" src="${d.avatar}" alt="" loading="lazy"/>
       <div class="card-identity">
         <div class="card-name">${esc(d.name)}</div>
@@ -1397,7 +1468,7 @@ function renderCard(d) {
       </div>
       <div class="score-badge ${scoreClass}">${d.score}</div>
     </div>
-    <div class="card-body">
+    <div class="card-body" onclick="openProfileModal('${d.login}')">
       ${d.bio ? `<div class="card-bio">${esc(d.bio)}</div>` : ''}
       <div class="badges">${badges}</div>
       <div class="card-stats">
@@ -1409,7 +1480,6 @@ function renderCard(d) {
     <div class="card-footer">
       <span class="card-email">${d.email ? '✉ '+esc(d.email) : ''}</span>
       <div class="card-actions">
-        <button class="view-btn" onclick="openProfileModal('${d.login}')">View</button>
         <button class="icon-btn saved-btn${isSaved?' is-saved':''}" title="${isSaved?'Unsave':'Save'}" onclick="toggleSave('${d.login}')">⭐</button>
         <button class="icon-btn" title="Outreach" onclick="openOutreachModal('${d.login}')">✉</button>
         <a class="icon-btn" href="https://github.com/${d.login}" target="_blank" title="GitHub">⧉</a>
@@ -1464,7 +1534,7 @@ function openProfileModal(login) {
         <textarea class="notes-area" placeholder="Interview stage, fit notes, follow-up date…" onblur="saveNote('${login}',this.value)">${esc(note)}</textarea>
       </div>
       <div class="modal-actions">
-        <button class="btn primary" onclick="openOutreachModal('${login}');closeModal()">✉ Generate Outreach</button>
+        <button class="btn primary" onclick="openOutreachModal('${login}')">✉ Generate Outreach</button>
         <a class="btn" href="https://github.com/${login}" target="_blank">GitHub ↗</a>
         <button class="btn sm" onclick="toggleSave('${login}')">${state.saved.includes(login)?'★ Saved':'☆ Save'}</button>
       </div>
@@ -1500,19 +1570,102 @@ function openProfileModal(login) {
   });
 }
 
+function buildMsg(tone, dev, rc) {
+  const archetype = detectOutreachArchetype(dev.signals);
+  const firstName = (dev.name && dev.name !== dev.login) ? dev.name.split(' ')[0] : 'there';
+  const skillString = buildSmartSkillString(dev.signals);
+  const repo = dev.sourceRepo || 'the Solana ecosystem';
+  const company = rc.companyName || '[Your company]';
+  const role = rc.roleName || '[Role title]';
+  const vp = rc.valueProp || '';
+
+  // --- OPENING ---
+  let opening;
+  if (tone === 'linkedin') {
+    opening = dev.score >= 70
+      ? `Hi ${firstName}! Your Solana work on ${repo} really stood out`
+      : dev.company ? `Hi ${firstName}! Your work at ${dev.company} caught my eye`
+      : `Hi ${firstName}! Came across your contributions to ${repo}`;
+  } else if (tone === 'technical') {
+    opening = `Hey ${firstName},\n\nI was going through contributors on ${repo} and your commit history stood out — especially your work in ${skillString}.`;
+  } else if (tone === 'story') {
+    opening = dev.score >= 70
+      ? `Hi ${firstName},\n\nI've been studying the most impactful Solana contributors, and your work on ${repo} kept coming up. ${archetype.hooks[1]}.`
+      : `Hi ${firstName},\n\nI came across your work on ${repo} and something about your profile caught my attention — ${archetype.hooks[0]}.`;
+  } else { // direct
+    opening = dev.company
+      ? `Hi ${firstName},\n\nYour work at ${dev.company} and contributions to ${repo} caught my attention.`
+      : dev.daysAgo !== null && dev.daysAgo < 30
+      ? `Hi ${firstName},\n\nI noticed your recent contributions to ${repo} — always great to see active Solana developers.`
+      : `Hi ${firstName},\n\nYour contributions to ${repo} caught my attention.`;
+  }
+
+  // --- CREDIBILITY ---
+  let credibility = '';
+  if (tone === 'direct') {
+    credibility = `Your ${skillString} experience and ${dev.contributions} commits demonstrate real technical depth.`;
+  } else if (tone === 'technical') {
+    const parts = [`${dev.contributions} contributions`];
+    if (dev.publicRepos > 20) parts.push(`${dev.publicRepos} public repos`);
+    credibility = `With ${parts.join(', ')}, and clear depth in ${skillString}, you're the kind of engineer who understands Solana at the protocol level.`;
+  } else if (tone === 'story') {
+    credibility = `What stood out was your depth in ${skillString} — ${dev.contributions} contributions isn't something you see every day.`;
+  }
+
+  // --- PITCH ---
+  let pitch;
+  const roleStr = `${role} at ${company}`;
+  const vpStr = vp ? ` ${vp}.` : '';
+  if (tone === 'linkedin') {
+    pitch = ` — we're hiring a ${role} at ${company}${vp ? ' (' + vp + ')' : ''}. Your ${skillString.split(',')[0] || 'Solana'} background looks like a great fit.`;
+  } else if (tone === 'technical') {
+    pitch = `We're looking for a ${roleStr}.${vpStr} The role involves ${archetype.pitchAngle} — the kind of work that needs someone who has shipped real code in this space.`;
+  } else if (tone === 'story') {
+    pitch = `We're building something ambitious at ${company} — ${vp || '[describe your mission]'}. We believe Solana is the only network that can support the scale and speed we need.\n\nThe challenges ahead require engineers who understand ${archetype.pitchAngle}. Looking at your work, I think you'd find them genuinely exciting.`;
+  } else {
+    pitch = `We're hiring a ${roleStr}.${vpStr} Your expertise in ${archetype.pitchAngle} is exactly what this role needs.`;
+  }
+
+  // --- CTA ---
+  let cta;
+  if (tone === 'linkedin') cta = ' Open to a quick chat?';
+  else if (tone === 'technical') cta = `Happy to share our technical architecture if you're curious — no pressure, just a conversation between engineers.`;
+  else if (tone === 'story') cta = `I'd love to share the full vision and explore whether there's a mutual fit. Would you be open to connecting?`;
+  else cta = `Would you be open to a 20-minute call this week?`;
+
+  // --- SIGNOFF ---
+  const signoff = tone !== 'linkedin' ? `Best,\n${rc.companyName || '[Your name]'}` : '';
+
+  // --- ASSEMBLE ---
+  if (tone === 'linkedin') {
+    let msg = opening + pitch + cta;
+    if (msg.length > 300) {
+      pitch = ` — we're hiring a ${role} at ${company}. Your ${skillString.split(',')[0] || 'Solana'} background is a fit.`;
+      msg = opening + pitch + cta;
+    }
+    return msg;
+  }
+  return [opening, credibility, pitch, cta, signoff].filter(Boolean).join('\n\n');
+}
+
 function openOutreachModal(login) {
   const dev = state.contributors.find(d => d.login === login);
   if (!dev) return;
-  let activeTone = 'direct';
 
-  function buildMsg(tone) {
-    const name = dev.name && dev.name !== dev.login ? dev.name.split(' ')[0] : 'there';
-    const skills = dev.signals.filter(s => ['RUST','ANCHOR','DEFI','NFT','ZK','VALIDATOR'].includes(s)).join(', ') || 'Solana';
-    const repo = dev.sourceRepo || 'the Solana ecosystem';
-    if (tone === 'direct') return `Hi ${name},\n\nYour contributions to ${repo} caught my attention — your ${skills} experience is exactly what we're looking for.\n\nWe're building [describe your project] on Solana and are looking for engineers who understand the ecosystem at a deep level. Your ${dev.contributions} commits demonstrate real technical depth.\n\nWould you be open to a 20-minute call to hear what we're working on?\n\nBest,\n[Your name]`;
-    if (tone === 'linkedin') return `Hi ${name}! Saw your work on ${repo} — we're building [X] on Solana and your ${skills.split(',')[0]||'Solana'} background is a perfect fit. Open to a quick chat?`;
-    return `Hi ${name},\n\nI came across your work on ${repo} and I'm genuinely impressed by your depth in ${skills}.\n\nWe're on a mission to [describe mission] — and we believe Solana is the only network that can support the scale and speed we need to make this a reality.\n\nThe problems we're solving require engineers who've been in the trenches of the Solana ecosystem. Looking at your work, I think you'd find the challenges ahead genuinely exciting.\n\nI'd love to share what we're building and explore whether there's a mutual fit. Up for a call?\n\nBest,\n[Your name]`;
-  }
+  const archetype = detectOutreachArchetype(dev.signals);
+  const rc = getRecruiterContext();
+  const hasCtx = !!(rc.companyName || rc.roleName);
+  window._outreachDev = dev;
+
+  window._outreachRegenerate = function() {
+    const ctx = getRecruiterContext();
+    const tone = document.querySelector('.outreach-tab.active')?.dataset?.tone || 'direct';
+    const msg = buildMsg(tone, dev, ctx);
+    const ta = document.getElementById('outreachText');
+    if (ta) { ta.value = msg; updateCharCounter(msg.length, tone); }
+  };
+
+  const initMsg = buildMsg('direct', dev, rc);
 
   document.getElementById('modalContent').innerHTML = `
     <div class="modal-header">
@@ -1520,26 +1673,48 @@ function openOutreachModal(login) {
       <div><div class="modal-name">Outreach — ${esc(dev.name)}</div><div class="modal-handle">@${dev.login}</div></div>
     </div>
     <div class="modal-body">
-      <div class="outreach-tabs">
-        <button class="outreach-tab active" onclick="setOutreachTone(this,'direct')">Direct</button>
-        <button class="outreach-tab" onclick="setOutreachTone(this,'linkedin')">LinkedIn</button>
-        <button class="outreach-tab" onclick="setOutreachTone(this,'story')">Story-led</button>
+      <div class="archetype-label">Detected as: ${archetype.label}</div>
+
+      <div class="recruiter-ctx">
+        <div class="recruiter-ctx-header" onclick="toggleRecruiterCtx()">
+          <span class="modal-section-title" style="margin:0">RECRUITER CONTEXT</span>
+          <span class="recruiter-ctx-toggle${hasCtx ? ' collapsed' : ''}" id="recruiterCtxToggle">▾</span>
+        </div>
+        ${hasCtx ? `<div class="recruiter-ctx-summary" id="recruiterCtxSummary">${esc(rc.companyName || '')}${rc.roleName ? ' — ' + esc(rc.roleName) : ''}</div>` : ''}
+        <div class="recruiter-ctx-body${hasCtx ? ' collapsed' : ''}" id="recruiterCtxBody">
+          <input class="recruiter-input" id="rcCompany" placeholder="Your company name" value="${esc(rc.companyName || '')}" oninput="updateRecruiterCtx()"/>
+          <input class="recruiter-input" id="rcRole" placeholder="Role (e.g. Senior Rust Engineer)" value="${esc(rc.roleName || '')}" oninput="updateRecruiterCtx()"/>
+          <input class="recruiter-input" id="rcValueProp" placeholder="Value prop (e.g. Building the fastest DEX on Solana)" value="${esc(rc.valueProp || '')}" oninput="updateRecruiterCtx()"/>
+        </div>
       </div>
-      <textarea class="outreach-msg" id="outreachText">${buildMsg('direct')}</textarea>
+
+      <div class="outreach-tabs">
+        <button class="outreach-tab active" data-tone="direct" onclick="setOutreachTone(this,'direct')">Direct</button>
+        <button class="outreach-tab" data-tone="linkedin" onclick="setOutreachTone(this,'linkedin')">LinkedIn</button>
+        <button class="outreach-tab" data-tone="technical" onclick="setOutreachTone(this,'technical')">Technical</button>
+        <button class="outreach-tab" data-tone="story" onclick="setOutreachTone(this,'story')">Story-led</button>
+      </div>
+      <textarea class="outreach-msg" id="outreachText" oninput="updateCharCounter(this.value.length)">${initMsg}</textarea>
+      <div class="char-counter hidden" id="charCounter"></div>
       <div class="modal-actions">
         <button class="btn primary" onclick="copyText('outreachText')">Copy Message</button>
-        <a class="btn" href="mailto:${dev.email||''}" ${dev.email?'':'style="opacity:0.5;pointer-events:none"'}>✉ Email ${dev.email?dev.email:''}</a>
+        <a class="btn" href="mailto:${dev.email || ''}" ${dev.email ? '' : 'style="opacity:0.5;pointer-events:none"'}>Email ${dev.email ? esc(dev.email) : ''}</a>
+        <button class="btn sm" onclick="window._outreachRegenerate()">Regenerate</button>
       </div>
     </div>`;
 
-  window._outreachBuildMsg = buildMsg;
   showModal();
 }
 
 window.setOutreachTone = function(btn, tone) {
   document.querySelectorAll('.outreach-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('outreachText').value = window._outreachBuildMsg(tone);
+  const dev = window._outreachDev;
+  if (dev) {
+    const msg = buildMsg(tone, dev, getRecruiterContext());
+    document.getElementById('outreachText').value = msg;
+    updateCharCounter(msg.length, tone);
+  }
 };
 
 function openTokenModal() {
@@ -1589,6 +1764,44 @@ function handleOverlayClick(e) { if (e.target === document.getElementById('modal
 // ==========================================================================
 // ACTIONS
 // ==========================================================================
+
+function getRecruiterContext() {
+  try { return JSON.parse(localStorage.getItem('sol_recruiter') || '{}'); } catch { return {}; }
+}
+function saveRecruiterContext(ctx) { localStorage.setItem('sol_recruiter', JSON.stringify(ctx)); }
+
+function toggleRecruiterCtx() {
+  const body = document.getElementById('recruiterCtxBody');
+  const toggle = document.getElementById('recruiterCtxToggle');
+  const summary = document.getElementById('recruiterCtxSummary');
+  body.classList.toggle('collapsed');
+  toggle.classList.toggle('collapsed');
+  if (summary) summary.classList.toggle('hidden');
+}
+
+function updateRecruiterCtx() {
+  const ctx = {
+    companyName: document.getElementById('rcCompany')?.value?.trim() || '',
+    roleName: document.getElementById('rcRole')?.value?.trim() || '',
+    valueProp: document.getElementById('rcValueProp')?.value?.trim() || '',
+  };
+  saveRecruiterContext(ctx);
+  clearTimeout(window._rcDebounce);
+  window._rcDebounce = setTimeout(() => { if (window._outreachRegenerate) window._outreachRegenerate(); }, 400);
+}
+
+function updateCharCounter(len, tone) {
+  const el = document.getElementById('charCounter');
+  if (!el) return;
+  const t = tone || (document.querySelector('.outreach-tab.active')?.dataset?.tone);
+  if (t === 'linkedin') {
+    el.classList.remove('hidden');
+    el.textContent = `${len} / 300`;
+    el.className = 'char-counter' + (len > 300 ? ' over' : len > 260 ? ' warn' : '');
+  } else {
+    el.classList.add('hidden');
+  }
+}
 
 function toggleSave(login) {
   const idx = state.saved.indexOf(login);
