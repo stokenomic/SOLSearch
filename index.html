@@ -1650,7 +1650,7 @@ function buildMsg(tone, dev, rc) {
 
 function openOutreachModal(login) {
   const dev = state.contributors.find(d => d.login === login);
-  if (!dev) return;
+  if (!dev) { showToast('Developer data not found — try searching again'); return; }
 
   const archetype = detectOutreachArchetype(dev.signals);
   const rc = getRecruiterContext();
