@@ -992,8 +992,16 @@ async function selectCompany(org) {
   document.getElementById('companyActionBar').classList.add('hidden');
 
   try {
-    // Always fetch live from GitHub so we show real repos with accurate star counts
-    const repos = await fetchOrgRepos(org).then(r => r.slice(0, 20));
+    // Use predefined repos if available, otherwise fetch live from GitHub
+    // If token is set, always fetch live for accurate star counts
+    let repos;
+    if (state.token) {
+      repos = await fetchOrgRepos(org).then(r => r.slice(0, 20));
+    } else if (company.repos.length > 0) {
+      repos = company.repos.map(r => ({ name: r, stargazers_count: 0 }));
+    } else {
+      repos = await fetchOrgRepos(org).then(r => r.slice(0, 20));
+    }
 
     drawer.innerHTML = `
       <div class="repo-drawer">
