@@ -457,13 +457,23 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
 
 <main>
   <div class="mode-tabs">
-    <button class="tab active" data-mode="ai" onclick="switchMode('ai')">🤖 AI Discovery</button>
+    <button class="tab active" data-mode="recent" onclick="switchMode('recent')">🔥 Recent Devs</button>
+    <button class="tab" data-mode="ai" onclick="switchMode('ai')">🤖 AI Discovery</button>
     <button class="tab" data-mode="companies" onclick="switchMode('companies')">🏢 Companies</button>
     <button class="tab" data-mode="programs" onclick="switchMode('programs')">⚡ Program Types</button>
   </div>
 
+  <!-- Recent Devs -->
+  <div class="panel" id="panel-recent">
+    <p class="section-label">Developers with recent commits across top Solana repositories</p>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <button class="btn primary" onclick="searchRecentBuilders()">Find Recent Devs</button>
+      <span style="font-size:12px;color:var(--t3)" id="recentCost">Scans 15 key repos · ~115 API calls · best with token</span>
+    </div>
+  </div>
+
   <!-- AI Discovery -->
-  <div class="panel" id="panel-ai">
+  <div class="panel hidden" id="panel-ai">
     <p class="section-label">Select a developer archetype to search pre-mapped Solana repositories</p>
     <div class="archetypes-grid" id="archetypesGrid"></div>
   </div>
@@ -542,6 +552,17 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
 // ==========================================================================
 // DATA
 // ==========================================================================
+
+// Curated high-signal repos for "Recent Builders" — kept small to manage API cost
+const RECENT_BUILDER_REPOS = [
+  'solana-labs/solana','anza-xyz/agave','coral-xyz/anchor',
+  'solana-labs/solana-program-library','jup-ag/terminal',
+  'drift-labs/protocol-v2','orca-so/whirlpools','raydium-io/raydium-clmm',
+  'metaplex-foundation/metaplex-program-library','helius-labs/yellowstone-grpc',
+  'jito-foundation/jito-solana','marinade-finance/liquid-staking-program',
+  'mrgnlabs/marginfi-v2-ui','Lightprotocol/light-protocol',
+  'magicblock-labs/ephemeral-rollups-spl',
+];
 
 const COMPANIES = [
   // Foundation
@@ -926,6 +947,19 @@ function daysSince(dateStr) {
 // SEARCH LOGIC
 // ==========================================================================
 
+
+async function searchRecentBuilders() {
+  await runSearch(RECENT_BUILDER_REPOS, 'Recent Devs — Top Solana Repos');
+  // Re-sort by recency (most recent first) and filter to active-only
+  state.contributors.sort((a,b) => (a.daysAgo ?? 999) - (b.daysAgo ?? 999));
+  state.filtered = state.contributors.filter(d => d.daysAgo !== null && d.daysAgo <= 90);
+  // Auto-check the active filter
+  document.getElementById('fActive').checked = true;
+  renderSummary();
+  renderCards();
+  // Update sort dropdown to show recency
+  document.getElementById('fSort').value = 'recency';
+}
 
 async function runSearch(repoPaths, sourceLabel) {
   showResults();
@@ -1877,7 +1911,7 @@ function switchMode(mode) {
   state.activeArchetype = null;
   state.selectedRepos.clear();
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
-  ['ai','companies','programs'].forEach(m => {
+  ['recent','ai','companies','programs'].forEach(m => {
     document.getElementById(`panel-${m}`).classList.toggle('hidden', m !== mode);
   });
   // Re-render all grids to clear stale drawers
