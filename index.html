@@ -306,7 +306,8 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
 }
 .modal {
   background:var(--card); border:1px solid var(--border); border-radius:14px;
-  width:100%; max-width:600px; max-height:88vh; overflow-y:auto; position:relative;
+  width:100%; max-width:600px; max-height:88vh; overflow:hidden; position:relative;
+  display:flex; flex-direction:column;
 }
 .modal-header { display:flex; align-items:center; gap:12px; padding:20px 20px 0; }
 .modal-avatar { width:56px; height:56px; border-radius:50%; border:2px solid var(--border); }
@@ -329,11 +330,11 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
 }
 .modal-stat-val { font-size:20px; font-weight:700; color:var(--t1); }
 .modal-stat-label { font-size:10px; color:var(--t3); margin-top:2px; }
-.top-repos { display:flex; flex-direction:column; gap:6px; }
+.top-repos { display:flex; flex-direction:column; gap:6px; overflow:hidden; }
 .top-repo {
   display:flex; align-items:center; justify-content:space-between;
   padding:8px 12px; border-radius:8px; background:var(--bg2); border:1px solid var(--border);
-  font-size:12px;
+  font-size:12px; overflow:hidden;
 }
 .top-repo a:hover { color:var(--purple); }
 .repo-stars { font-size:11px; color:var(--t3); }
@@ -368,7 +369,7 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
 .char-counter { font-size:11px; text-align:right; margin-top:4px; color:var(--t3); }
 .char-counter.warn { color:#f59e0b; }
 .char-counter.over { color:#ef4444; }
-.modal-actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+.modal-actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; position:relative; z-index:2; }
 .token-input {
   width:100%; padding:10px 14px; border-radius:8px; font-size:13px;
   background:var(--bg2); border:1px solid var(--border); color:var(--t1); outline:none;
@@ -536,7 +537,8 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
 <div id="modalOverlay" class="modal-overlay hidden" onclick="handleOverlayClick(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="closeModal()">✕</button>
-    <div id="modalContent"></div>
+    <div id="modalContent" style="overflow-y:auto;flex:1;min-height:0"></div>
+    <div id="modalFooter"></div>
   </div>
 </div>
 
@@ -1542,11 +1544,13 @@ function openProfileModal(login) {
         <div class="modal-section-title">Recruiter Notes</div>
         <textarea class="notes-area" placeholder="Interview stage, fit notes, follow-up date…" onblur="saveNote('${login}',this.value)">${esc(note)}</textarea>
       </div>
-      <div class="modal-actions">
-        <button class="btn primary" onclick="openOutreachModal('${login}')">✉ Generate Outreach</button>
-        <a class="btn" href="https://github.com/${login}" target="_blank">GitHub ↗</a>
-        <button class="btn sm" onclick="toggleSave('${login}')">${state.saved.includes(login)?'★ Saved':'☆ Save'}</button>
-      </div>
+    </div>`;
+
+  document.getElementById('modalFooter').innerHTML = `
+    <div class="modal-actions" style="padding:0 20px 16px">
+      <button class="btn primary" onclick="openOutreachModal('${login}')">✉ Generate Outreach</button>
+      <a class="btn" href="https://github.com/${login}" target="_blank">GitHub ↗</a>
+      <button class="btn sm" onclick="toggleSave('${login}')">${state.saved.includes(login)?'★ Saved':'☆ Save'}</button>
     </div>`;
 
   showModal();
@@ -1658,6 +1662,7 @@ function buildMsg(tone, dev, rc) {
 }
 
 function openOutreachModal(login) {
+  clearModalFooter();
   const dev = state.contributors.find(d => d.login === login);
   if (!dev) { showToast('Developer data not found — try searching again'); return; }
 
@@ -1727,6 +1732,7 @@ window.setOutreachTone = function(btn, tone) {
 };
 
 function openTokenModal() {
+  clearModalFooter();
   document.getElementById('modalContent').innerHTML = `
     <div class="modal-header"><div><div class="modal-name">GitHub Token</div></div></div>
     <div class="modal-body">
@@ -1744,6 +1750,7 @@ function openTokenModal() {
 }
 
 function openSavedModal() {
+  clearModalFooter();
   const devs = state.contributors.filter(d => state.saved.includes(d.login));
   const allSaved = state.saved;
   document.getElementById('modalContent').innerHTML = `
@@ -1767,6 +1774,7 @@ function openSavedModal() {
 }
 
 function showModal() { document.getElementById('modalOverlay').classList.remove('hidden'); }
+function clearModalFooter() { document.getElementById('modalFooter').innerHTML = ''; }
 function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); }
 function handleOverlayClick(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
 
