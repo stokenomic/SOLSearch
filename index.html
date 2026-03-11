@@ -284,6 +284,9 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
 .badge-PYTHON { background:rgba(234,179,8,0.15); border:1px solid rgba(234,179,8,0.4); color:#facc15; }
 .badge-VALIDATOR { background:rgba(251,146,60,0.15); border:1px solid rgba(251,146,60,0.4); color:#fb923c; }
 .badge-WEB3 { background:rgba(153,69,255,0.15); border:1px solid rgba(153,69,255,0.4); color:var(--purple); }
+.sol-badges .badge { font-size:11px; padding:3px 10px; }
+.no-signals { font-size:11px; color:var(--t3); font-style:italic; margin:4px 0; }
+.dev-card.has-sol { border-color:rgba(20,241,149,0.2); }
 
 .card-stats { display:flex; gap:14px; font-size:11px; color:var(--t3); }
 .stat-val { font-weight:600; color:var(--t2); }
@@ -505,18 +508,24 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
       <span class="result-source" id="resultSource"></span>
       <button class="btn sm" onclick="clearResults()" title="Clear results">✕ Clear</button>
       <div class="filters-row">
+        <label class="filter-check"><input type="checkbox" id="fSolana" onchange="applyFilters()"> Solana signals</label>
         <label class="filter-check"><input type="checkbox" id="fEmail" onchange="applyFilters()"> Has email</label>
         <label class="filter-check"><input type="checkbox" id="fActive" onchange="applyFilters()"> Active 90d</label>
         <label class="filter-check"><input type="checkbox" id="fSaved" onchange="applyFilters()"> Saved only</label>
         <select class="filter-select" id="fLang" onchange="applyFilters()">
-          <option value="">All languages</option>
-          <option value="SOL">Solana</option>
+          <option value="">All signals</option>
+          <option value="SOL">SOL</option>
           <option value="RUST">Rust</option>
           <option value="ANCHOR">Anchor</option>
-          <option value="TS">TypeScript</option>
+          <option value="SPL">SPL</option>
+          <option value="METAPLEX">Metaplex</option>
+          <option value="VALIDATOR">Validator</option>
           <option value="DEFI">DeFi</option>
           <option value="NFT">NFT</option>
           <option value="ZK">ZK</option>
+          <option value="TS">TypeScript</option>
+          <option value="PYTHON">Python</option>
+          <option value="WEB3">Web3</option>
         </select>
         <input class="filter-search" id="fSearch" placeholder="Search name, location…" oninput="applyFilters()"/>
         <select class="filter-select" id="fSort" onchange="applyFilters()">
@@ -748,6 +757,8 @@ const SOL_COMPANY_NAMES = [
   "loopscale","step","magiceden","igneous","ellipsis","blockworks","cardinal",
 ];
 
+const SOLANA_CORE_SIGNALS = ['SOL','ANCHOR','SPL','METAPLEX'];
+
 const SIGNAL_DESCRIPTIONS = {
   SOL:'Solana ecosystem development', RUST:'Rust systems programming',
   ANCHOR:'Anchor on-chain development', SPL:'SPL token program expertise',
@@ -883,6 +894,10 @@ function detectSignals(user) {
   // Always add SOL if any known company
   if (!found.includes('SOL') && SOL_COMPANY_NAMES.some(n => text.includes(n))) found.push('SOL');
   return found;
+}
+
+function hasSolanaSignals(dev) {
+  return dev.signals.some(s => SOLANA_CORE_SIGNALS.includes(s));
 }
 
 function detectOutreachArchetype(signals) {
@@ -1374,6 +1389,7 @@ async function searchArchetypeRepos() {
 // ==========================================================================
 
 function applyFilters() {
+  const solOnly  = document.getElementById('fSolana').checked;
   const hasEmail = document.getElementById('fEmail').checked;
   const active   = document.getElementById('fActive').checked;
   const saved    = document.getElementById('fSaved').checked;
@@ -1381,6 +1397,7 @@ function applyFilters() {
   const q        = document.getElementById('fSearch').value.toLowerCase();
 
   state.filtered = state.contributors.filter(d => {
+    if (solOnly && !hasSolanaSignals(d)) return false;
     if (hasEmail && !d.email) return false;
     if (active && (d.daysAgo === null || d.daysAgo > 90)) return false;
     if (saved && !state.saved.includes(d.login)) return false;
@@ -1411,6 +1428,8 @@ function renderSummary() {
   el.classList.remove('hidden');
 
   const avgScore = Math.round(devs.reduce((s,d) => s + d.score, 0) / devs.length);
+  const withSolana = devs.filter(d => hasSolanaSignals(d)).length;
+  const solanaPct = Math.round(withSolana / devs.length * 100);
   const withEmail = devs.filter(d => d.email).length;
   const emailPct = Math.round(withEmail / devs.length * 100);
   const active90 = devs.filter(d => d.daysAgo !== null && d.daysAgo <= 90).length;
@@ -1428,6 +1447,7 @@ function renderSummary() {
 
   el.innerHTML = `
     <div class="summary-stat"><span class="sv purple">${avgScore}</span> avg score</div>
+    <div class="summary-stat clickable" onclick="document.getElementById('fSolana').checked=!document.getElementById('fSolana').checked;applyFilters()"><span class="sv green">${solanaPct}%</span> Solana signals (${withSolana})</div>
     <div class="summary-stat clickable" onclick="document.getElementById('fEmail').checked=!document.getElementById('fEmail').checked;applyFilters()"><span class="sv green">${emailPct}%</span> have email (${withEmail})</div>
     <div class="summary-stat clickable" onclick="document.getElementById('fActive').checked=!document.getElementById('fActive').checked;applyFilters()"><span class="sv green">${activePct}%</span> active 90d (${active90})</div>
     ${topSigs.length ? `<div class="summary-stat">Top: ${topSigs.map(([s,c]) => `<span class="badge badge-${s}" style="margin-left:4px">${s}</span>`).join('')}</div>` : ''}
@@ -1450,11 +1470,11 @@ function renderCards() {
 function renderCard(d) {
   const scoreClass = d.score >= 70 ? 'score-high' : d.score >= 40 ? 'score-mid' : 'score-low';
   const isSaved = state.saved.includes(d.login);
-  const badges = d.signals.slice(0, 5).map(s =>
-    `<span class="badge badge-${s}">${s}</span>`
-  ).join('');
+  const solBadges = d.signals.filter(s => SOLANA_CORE_SIGNALS.includes(s));
+  const otherBadges = d.signals.filter(s => !SOLANA_CORE_SIGNALS.includes(s));
+  const hasSol = solBadges.length > 0;
 
-  return `<div class="dev-card${isSaved?' saved':''}" id="dc-${d.login}">
+  return `<div class="dev-card${isSaved?' saved':''}${hasSol ? ' has-sol' : ''}" id="dc-${d.login}">
     <div class="card-header" onclick="openProfileModal('${d.login}')">
       <img class="avatar" src="${d.avatar}" alt="" loading="lazy"/>
       <div class="card-identity">
@@ -1470,7 +1490,9 @@ function renderCard(d) {
     </div>
     <div class="card-body" onclick="openProfileModal('${d.login}')">
       ${d.bio ? `<div class="card-bio">${esc(d.bio)}</div>` : ''}
-      <div class="badges">${badges}</div>
+      ${solBadges.length ? `<div class="badges sol-badges">${solBadges.map(s => `<span class="badge badge-${s}">${s}</span>`).join('')}</div>` : ''}
+      ${otherBadges.length ? `<div class="badges">${otherBadges.map(s => `<span class="badge badge-${s}">${s}</span>`).join('')}</div>` : ''}
+      ${!d.signals.length ? `<div class="no-signals">No Solana signals detected</div>` : ''}
       <div class="card-stats">
         <span>Commits <span class="stat-val">${d.contributions}</span></span>
         <span>Repos <span class="stat-val">${d.publicRepos || '–'}</span></span>
