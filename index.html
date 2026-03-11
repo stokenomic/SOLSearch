@@ -992,14 +992,18 @@ async function selectCompany(org) {
   document.getElementById('companyActionBar').classList.add('hidden');
 
   try {
-    // Use predefined repos if available, otherwise fetch live from GitHub
-    // If token is set, always fetch live for accurate star counts
-    let repos;
+    // Start with predefined repos (instant, always works)
+    let repos = company.repos.map(r => ({ name: r, stargazers_count: 0 }));
+    // If token set, try to fetch live repos (better data, star counts)
+    // Fall back to predefined if live fetch returns empty (e.g. fine-grained token)
     if (state.token) {
-      repos = await fetchOrgRepos(org).then(r => r.slice(0, 20));
-    } else if (company.repos.length > 0) {
-      repos = company.repos.map(r => ({ name: r, stargazers_count: 0 }));
-    } else {
+      try {
+        const live = await fetchOrgRepos(org).then(r => r.slice(0, 20));
+        if (live.length > 0) repos = live;
+      } catch(e) { /* keep predefined */ }
+    }
+    // If nothing at all, try unauthenticated fetch
+    if (!repos.length) {
       repos = await fetchOrgRepos(org).then(r => r.slice(0, 20));
     }
 
