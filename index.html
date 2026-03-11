@@ -136,11 +136,6 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
 .company-name { font-size:13px; font-weight:600; }
 .company-cat { font-size:11px; color:var(--t3); margin-top:2px; }
 
-.repo-drawer {
-  margin-top:12px; padding:16px; border-radius:var(--radius);
-  background:var(--bg2); border:1px solid var(--border);
-}
-.repo-drawer h4 { font-size:12px; color:var(--t2); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.06em; }
 .repo-list { display:flex; flex-direction:column; gap:6px; }
 .repo-item {
   display:flex; align-items:center; gap:10px; padding:8px 12px;
@@ -173,7 +168,7 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
 .program-card.featured .program-icon { font-size:38px; margin-bottom:0; flex-shrink:0; }
 .program-card.featured .program-name { font-size:15px; }
 .program-card.featured .program-count { color:var(--green); font-size:12px; }
-.program-inline-drawer {
+.inline-drawer {
   grid-column:1/-1; background:var(--card2);
   border:1px solid rgba(153,69,255,0.35); border-radius:var(--radius);
   padding:16px 20px; animation:slideDown 0.18s ease;
@@ -182,22 +177,26 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
   from { opacity:0; transform:translateY(-6px); }
   to   { opacity:1; transform:translateY(0); }
 }
-.program-inline-drawer .repo-list { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
-.program-inline-drawer .repo-item { display:flex; align-items:center; gap:6px; padding:5px 10px; border-radius:6px; border:1px solid var(--border); background:var(--card); cursor:pointer; font-size:12px; transition:all 0.15s; }
-.program-inline-drawer .repo-item:hover { border-color:var(--purple); }
-.program-inline-drawer .repo-item.selected { border-color:var(--green); background:rgba(20,241,149,0.07); }
-.program-inline-drawer-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
-.program-inline-drawer-title { font-size:14px; font-weight:600; }
-.program-inline-drawer-actions { display:flex; gap:8px; align-items:center; margin-top:14px; }
+.inline-drawer .repo-list { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.inline-drawer .repo-item { display:flex; align-items:center; gap:6px; padding:5px 10px; border-radius:6px; border:1px solid var(--border); background:var(--card); cursor:pointer; font-size:12px; transition:all 0.15s; }
+.inline-drawer .repo-item:hover { border-color:var(--purple); }
+.inline-drawer .repo-item.selected { border-color:var(--green); background:rgba(20,241,149,0.07); }
+.inline-drawer-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+.inline-drawer-title { font-size:14px; font-weight:600; }
+.inline-drawer-actions { display:flex; gap:8px; align-items:center; margin-top:14px; }
 
-/* ---- Multi-select action bar ---- */
-.action-bar {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:12px 16px; border-radius:var(--radius); margin-top:12px;
-  background:rgba(20,241,149,0.05); border:1px solid var(--border2);
+/* ---- Results Summary ---- */
+.results-summary {
+  display:flex; gap:12px; flex-wrap:wrap; padding:12px 0; margin-bottom:8px;
+  border-bottom:1px solid var(--border);
 }
-.action-bar-text { font-size:13px; color:var(--t2); }
-.action-bar-text span { color:var(--green); font-weight:600; }
+.summary-stat {
+  padding:8px 14px; border-radius:8px; background:var(--card);
+  border:1px solid var(--border); font-size:12px; color:var(--t2);
+}
+.summary-stat .sv { font-weight:700; color:var(--t1); margin-right:4px; }
+.summary-stat .sv.green { color:var(--green); }
+.summary-stat .sv.purple { color:var(--purple); }
 
 /* ---- Results Header ---- */
 .results-header {
@@ -394,13 +393,30 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
 .saved-item-name { font-size:13px; flex:1; }
 .saved-item-handle { font-size:11px; color:var(--t3); }
 
-@media (max-width:640px) {
-  header { padding:12px; }
+@media (max-width:768px) {
+  header { padding:10px 12px; gap:8px; flex-wrap:wrap; }
+  .tagline { display:none; }
+  .header-right { gap:6px; }
+  .header-right .btn { padding:5px 8px; font-size:11px; }
   main { padding:16px 12px; }
+  .mode-tabs { flex-wrap:wrap; width:100%; }
+  .tab { padding:7px 12px; font-size:12px; flex:1; text-align:center; }
+  .search-row { flex-direction:column; }
+  .search-row .btn { width:100%; }
+  .archetypes-grid { grid-template-columns:1fr; }
+  .companies-grid { grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); }
+  .program-types-grid { grid-template-columns:1fr; }
   .cards-grid { grid-template-columns:1fr; }
+  .filters-row { gap:6px; flex-wrap:wrap; }
+  .filter-select { font-size:11px; min-width:0; flex:1; }
+  .results-summary { gap:6px; }
+  .summary-stat { padding:6px 10px; font-size:11px; }
+  .inline-drawer { padding:12px; }
+  .inline-drawer-header { flex-direction:column; align-items:flex-start; gap:8px; }
   .modal { max-height:94vh; }
-  .mode-tabs { flex-wrap:wrap; }
-  .filters-row { gap:6px; }
+  .modal-stats { grid-template-columns:repeat(2,1fr); }
+  .card-footer { flex-direction:column; gap:8px; }
+  .card-actions { justify-content:flex-start; }
 }
 </style>
 </head>
@@ -458,22 +474,12 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
     <p class="section-label">Browse Solana ecosystem companies and their repositories</p>
     <div class="cat-filters" id="catFilters"></div>
     <div class="companies-grid" id="companiesGrid"></div>
-    <div id="repoDrawer" class="hidden"></div>
-    <div id="companyActionBar" class="hidden action-bar">
-      <div class="action-bar-text">Selected <span id="selRepoCount">0</span> repos</div>
-      <button class="btn primary" onclick="searchSelectedRepos()">Find Developers →</button>
-    </div>
   </div>
 
   <!-- Program Types -->
   <div class="panel hidden" id="panel-programs">
     <p class="section-label">Find developers by Solana program type — DEX, Lending, NFT, Validators & more</p>
     <div class="program-types-grid" id="programTypesGrid"></div>
-    <div id="programRepoDrawer" class="hidden"></div>
-    <div id="programActionBar" class="hidden action-bar">
-      <div class="action-bar-text">Selected <span id="selProgramRepoCount">0</span> repos across <span id="selProgramName"></span></div>
-      <button class="btn primary" onclick="searchProgramRepos()">Find Developers →</button>
-    </div>
   </div>
 
   <!-- Results -->
@@ -481,6 +487,7 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
     <div class="results-header">
       <span class="result-count" id="resultCount">0 developers</span>
       <span class="result-source" id="resultSource"></span>
+      <button class="btn sm" onclick="clearResults()" title="Clear results">✕ Clear</button>
       <div class="filters-row">
         <label class="filter-check"><input type="checkbox" id="fEmail" onchange="applyFilters()"> Has email</label>
         <label class="filter-check"><input type="checkbox" id="fActive" onchange="applyFilters()"> Active 90d</label>
@@ -496,9 +503,16 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
           <option value="ZK">ZK</option>
         </select>
         <input class="filter-search" id="fSearch" placeholder="Search name, location…" oninput="applyFilters()"/>
+        <select class="filter-select" id="fSort" onchange="applyFilters()">
+          <option value="score">Sort: Score</option>
+          <option value="contributions">Sort: Commits</option>
+          <option value="recency">Sort: Recent</option>
+          <option value="name">Sort: Name</option>
+        </select>
         <button class="btn sm" onclick="exportCSV()">↓ CSV</button>
       </div>
     </div>
+    <div id="resultsSummary" class="results-summary hidden"></div>
     <div id="loadingWrap" class="loading-wrap hidden">
       <div class="loading-spinner"></div>
       <div>Fetching Solana contributors…</div>
@@ -606,27 +620,25 @@ const PROGRAM_TYPES = [
     desc:"Search contributors across the 50 most significant Solana programs at once — the broadest Solana talent pool available",
     repos:[
       // Core / Validator
-      "solana-labs/solana","anza-xyz/agave","firedancer-contributors/firedancer",
+      "solana-labs/solana","anza-xyz/agave","firedancer-io/firedancer",
       "solana-labs/solana-program-library","coral-xyz/anchor",
       // DEX / AMM
       "orca-so/whirlpools","raydium-io/raydium-clmm","raydium-io/raydium-amm",
-      "openbook-dex/openbook-program","Ellipsis-Labs/phoenix-v1","project-serum/serum-dex",
-      "saber-hq/saber-periphery",
+      "openbook-dex/openbook-v2","Ellipsis-Labs/phoenix-v1","project-serum/serum-dex",
       // Aggregators
-      "jup-ag/terminal","jup-ag/open-creator-protocol",
+      "jup-ag/terminal","jup-ag/jup-lock",
       // Lending
-      "solendprotocol/public","mrgnlabs/marginfi-v2","hubbleprotocol/kamino-lending",
-      "port-finance/variable-rate-lending","UXDProtocol/uxd-program",
+      "solendprotocol/public","mrgnlabs/marginfi-v2","kamino-finance/klend",
       // Perps
-      "drift-labs/protocol-v2","blockworks-foundation/mango-v4","zeta-markets/zeta-sdk",
+      "drift-labs/protocol-v2","blockworks-foundation/mango-v4","zetamarkets/zeta-abi",
       // Liquid Staking
-      "marinade-finance/marinade-ts-sdk","jito-foundation/jito-programs","sanctumlabs/lst-common",
+      "marinade-finance/liquid-staking-program","jito-foundation/jito-solana","igneous-labs/sanctum-lst-list",
       // NFT
       "metaplex-foundation/metaplex-program-library","metaplex-foundation/mpl-token-metadata",
       "metaplex-foundation/mpl-bubblegum","metaplex-foundation/mpl-core",
-      "tensor-oss/tensorswap-sdk","cardinal-labs/cardinal-token-manager",
+      "cardinal-labs/cardinal-token-manager",
       // Oracles
-      "pyth-network/pyth-client","pyth-network/pyth-sdk-rs","switchboard-xyz/switchboard-core",
+      "pyth-network/pyth-crosschain","pyth-network/pyth-examples","switchboard-xyz/on-demand",
       // Bridge
       "wormhole-foundation/wormhole","wormhole-foundation/wormhole-sdk-ts",
       // ZK
@@ -634,66 +646,63 @@ const PROGRAM_TYPES = [
       // Gaming
       "magicblock-labs/bolt","magicblock-labs/ephemeral-rollups-sdk",
       // Infrastructure
-      "helius-labs/helius-sdk","clockwork-xyz/clockwork","switchboard-xyz/switchboard-solana",
+      "helius-labs/helius-rust-sdk","clockwork-xyz/clockwork","switchboard-xyz/switchboard-sdk",
       // Payments / Governance
-      "solana-labs/solana-pay","solana-labs/governance-ui","metaDAOproject/metadao",
-      // Stablecoins
-      "hubbleprotocol/hubble-protocol",
+      "metaDAOproject/programs",
       // Tooling
-      "coral-xyz/backpack","jito-foundation/jito-solana",
+      "coral-xyz/backpack","jito-foundation/restaking",
       // New ecosystem additions
-      "MeteoraAg/meteora-dynamic-amm-sdk","Squads-Protocol/v4",
-      "solayer-labs/solayer-core","streamflow-finance/timelock",
-      "neonlabsorg/neon-evm","zetamarkets/zeta-sdk",
+      "MeteoraAg/dlmm-sdk","Squads-Protocol/v4",
+      "streamflow-finance/js-sdk","neonlabsorg/neon-evm",
   ]},
   { name:"DEX / AMM", icon:"🔄", desc:"Decentralized exchanges and automated market makers",
-    repos:["orca-so/whirlpools","orca-so/orca-sdks","raydium-io/raydium-clmm","raydium-io/raydium-amm","raydium-io/raydium-frontend","openbook-dex/openbook-program","openbook-dex/openbook-ts","Ellipsis-Labs/phoenix-v1","Ellipsis-Labs/phoenix-sdk","project-serum/serum-dex","saber-hq/saber-periphery","saber-hq/stable-swap","mercurial-finance/mercurial-dynamic-amm-sdk"] },
+    repos:["orca-so/whirlpools","raydium-io/raydium-clmm","raydium-io/raydium-amm","raydium-io/raydium-cp-swap","openbook-dex/openbook-v2","openbook-dex/openbook-ts","Ellipsis-Labs/phoenix-v1","Ellipsis-Labs/phoenix-sdk","project-serum/serum-dex","MeteoraAg/dynamic-bonding-curve","MeteoraAg/dlmm-sdk","MeteoraAg/damm-v2"] },
   { name:"Aggregators", icon:"🪐", desc:"DEX aggregators, swap routing and liquidity engines",
     repos:["jup-ag/terminal","jup-ag/open-creator-protocol","jup-ag/jup-lock"] },
   { name:"Lending / Borrowing", icon:"🏦", desc:"Lending protocols, money markets and collateralised borrowing",
-    repos:["solendprotocol/public","solendprotocol/solend-sdk","mrgnlabs/marginfi-v2","mrgnlabs/mrgn-ts","hubbleprotocol/kamino-lending","hubbleprotocol/hubble-public-api","port-finance/variable-rate-lending","UXDProtocol/uxd-program","solana-labs/solana-program-library"] },
+    repos:["solendprotocol/public","mrgnlabs/marginfi-v2","mrgnlabs/mrgn-ts","kamino-finance/klend","kamino-finance/klend-sdk","solana-labs/solana-program-library"] },
   { name:"Liquid Staking", icon:"💧", desc:"Liquid staking tokens, staking derivatives and LST protocols",
-    repos:["marinade-finance/marinade-ts-sdk","marinade-finance/marinade-client-rs","jito-foundation/jito-programs","jito-foundation/jito-ts","jito-foundation/jito-solana","sanctumlabs/lst-common","sanctumlabs/unstake-it"] },
+    repos:["marinade-finance/liquid-staking-program","marinade-finance/validator-bonds","jito-foundation/jito-solana","jito-foundation/restaking","igneous-labs/sanctum-lst-list","igneous-labs/sanctum-unstake-program"] },
   { name:"Perpetuals / Perps", icon:"📊", desc:"Perpetual futures, options and on-chain derivatives",
-    repos:["drift-labs/protocol-v2","drift-labs/drift-common","drift-labs/drift-py","blockworks-foundation/mango-v4","blockworks-foundation/mango-feeds","zeta-markets/zeta-sdk"] },
+    repos:["drift-labs/protocol-v2","drift-labs/drift-common","drift-labs/driftpy","blockworks-foundation/mango-v4","blockworks-foundation/mango-feeds","zetamarkets/zeta-abi"] },
   { name:"NFT / Marketplace", icon:"🎨", desc:"NFT programs, token standards and marketplace protocols",
-    repos:["metaplex-foundation/metaplex-program-library","metaplex-foundation/mpl-token-metadata","metaplex-foundation/mpl-bubblegum","metaplex-foundation/mpl-core","metaplex-foundation/digital-asset-standard-api","tensor-oss/tensorswap-sdk","tensor-oss/tcomp-program","cardinal-labs/cardinal-token-manager","cardinal-labs/cardinal-staking"] },
+    repos:["metaplex-foundation/metaplex-program-library","metaplex-foundation/mpl-token-metadata","metaplex-foundation/mpl-bubblegum","metaplex-foundation/mpl-core","metaplex-foundation/digital-asset-standard-api","cardinal-labs/cardinal-token-manager","cardinal-labs/cardinal-staking"] },
   { name:"Compressed NFTs", icon:"🌳", desc:"Merkle tree compressed NFT programs (cNFTs) and tooling",
     repos:["metaplex-foundation/mpl-bubblegum","metaplex-foundation/digital-asset-standard-api","solana-labs/solana-program-library"] },
   { name:"Oracles / Data Feeds", icon:"🔮", desc:"Price oracles, on-chain data feeds and randomness protocols",
-    repos:["pyth-network/pyth-client","pyth-network/pyth-sdk-rs","pyth-network/pyth-crosschain","pyth-network/pyth-sdk-solana","switchboard-xyz/switchboard-core","switchboard-xyz/switchboard-solana"] },
+    repos:["pyth-network/pyth-crosschain","pyth-network/pyth-examples","switchboard-xyz/on-demand","switchboard-xyz/switchboard-sdk"] },
   { name:"Cross-chain / Bridge", icon:"🌉", desc:"Cross-chain bridges, message passing and interoperability",
     repos:["wormhole-foundation/wormhole","wormhole-foundation/wormhole-sdk-ts"] },
   { name:"Validator / Core", icon:"⚡", desc:"Validator clients, Solana runtime and core protocol",
-    repos:["solana-labs/solana","anza-xyz/agave","firedancer-contributors/firedancer","jito-foundation/jito-solana","jito-foundation/jito-relayer","solana-labs/solana-program-library","coral-xyz/anchor"] },
+    repos:["solana-labs/solana","anza-xyz/agave","firedancer-io/firedancer","jito-foundation/jito-solana","solana-labs/solana-program-library","coral-xyz/anchor"] },
   { name:"ZK / Privacy", icon:"🔒", desc:"Zero-knowledge proofs and privacy-preserving protocols",
-    repos:["Lightprotocol/light-protocol","elusiv-privacy/elusiv"] },
+    repos:["Lightprotocol/light-protocol","Lightprotocol/light-poseidon"] },
   { name:"On-chain Gaming", icon:"🎮", desc:"On-chain game engines, ephemeral rollups and gaming SDKs",
-    repos:["magicblock-labs/bolt","magicblock-labs/ephemeral-rollups-sdk","honeycombprotocol/hive-control"] },
+    repos:["magicblock-labs/bolt","magicblock-labs/ephemeral-rollups-sdk","magicblock-labs/Solana.Unity-SDK"] },
   { name:"Governance / DAO", icon:"🗳", desc:"On-chain governance, DAO tooling and voting programs",
-    repos:["solana-labs/governance-ui","blockworks-foundation/voter-stake-registry","marinade-finance/governance-rewards"] },
+    repos:["metaDAOproject/programs","metaDAOproject/futarchy-indexer-v2","marinade-finance/validator-bonds"] },
   { name:"Payments", icon:"💳", desc:"Payments, commerce and point-of-sale programs on Solana",
-    repos:["solana-labs/solana-pay","tiplink/tiplink-open-source","sphere-labs/sphere","coinflow-labs/coinflow-client"] },
+    repos:["tiplink/tiplink-open-source","tiplink/tiplink-api","pump-fun/pump-public-docs"] },
   { name:"Stablecoins", icon:"💵", desc:"On-chain stablecoin protocols and synthetic asset programs",
-    repos:["UXDProtocol/uxd-program","hubbleprotocol/hubble-protocol"] },
+    repos:["kamino-finance/kvault","kamino-finance/klend"] },
   { name:"Token / SPL", icon:"🪙", desc:"SPL token programs, token extensions (Token-2022) and standards",
     repos:["solana-labs/solana-program-library","metaplex-foundation/metaplex-program-library"] },
   { name:"Automation / CRON", icon:"⏱", desc:"On-chain automation, cron jobs and scheduled transactions",
     repos:["clockwork-xyz/clockwork"] },
   { name:"RPC / Infrastructure", icon:"🔧", desc:"RPC nodes, indexers, streaming APIs and dev infrastructure",
-    repos:["helius-labs/helius-sdk","helius-labs/helius-rust-sdk","switchboard-xyz/switchboard-core","triton-one/yellowstone-grpc","GenesysGo/shadow-drive","syndica-io/chainsaw","quiknode-labs/qn-guide-examples"] },
+    repos:["helius-labs/helius-rust-sdk","helius-labs/helius-sdk","helius-labs/yellowstone-grpc","switchboard-xyz/on-demand","switchboard-xyz/switchboard-sdk","quiknode-labs/qn-guide-examples"] },
   { name:"Restaking", icon:"🔄", desc:"Liquid restaking protocols and restaked SOL derivatives",
-    repos:["solayer-labs/solayer-core","jito-foundation/jito-programs"] },
+    repos:["solayer-labs/solayer-cli","jito-foundation/restaking"] },
   { name:"Launchpad / Memecoins", icon:"🚀", desc:"Token launchpads, memecoin platforms and fair-launch protocols",
-    repos:["pump-fun/pump-interface","moonshot-labs/moonshot"] },
+    repos:["pump-fun/pump-public-docs","pump-fun/pump-segments-sdk","MeteoraAg/dynamic-bonding-curve"] },
   { name:"Liquidity / DLMM", icon:"🌊", desc:"Dynamic liquidity market makers and concentrated liquidity protocols",
-    repos:["MeteoraAg/meteora-dynamic-amm-sdk","MeteoraAg/dlmm-sdk","orca-so/whirlpools"] },
+    repos:["MeteoraAg/dlmm-sdk","MeteoraAg/damm-v2-sdk","MeteoraAg/dynamic-bonding-curve-sdk","orca-so/whirlpools"] },
   { name:"Multisig / Security", icon:"🔐", desc:"Multi-signature wallets, program security and access control",
     repos:["Squads-Protocol/v4","Squads-Protocol/squads-mpl"] },
   { name:"Token Vesting", icon:"🌊", desc:"Token streaming, vesting schedules and payroll protocols",
-    repos:["streamflow-finance/timelock","streamflow-finance/streamflow-sdk"] },
+    repos:["streamflow-finance/js-sdk","streamflow-finance/rust-sdk","streamflow-finance/streamflow-program"] },
   { name:"Identity / KYC", icon:"🪪", desc:"On-chain identity, credentials and KYC protocols",
-    repos:["civicteam/civic-link","Bonfida/spl-name-service","dialectlabs/blinks"] },
+    repos:["civicteam/solana-attestation-service","Bonfida/solana-name-service-guide","dialectlabs/blinks","dialectlabs/actions"] },
   { name:"EVM Compatibility", icon:"🟢", desc:"EVM emulation and Ethereum compatibility layers on Solana",
     repos:["neonlabsorg/neon-evm","neonlabsorg/neon-proxy.py"] },
 ];
@@ -737,6 +746,7 @@ const state = {
   selectedRepos: new Set(),
   activeCompany: null,
   activeProgramType: null,
+  activeArchetype: null,
   userCache: {},
   repoCache: {},
   currentSource: '',
@@ -928,6 +938,7 @@ async function runSearch(repoPaths, sourceLabel) {
 
     state.contributors.sort((a,b) => b.score - a.score);
     applyFilters();
+    setTimeout(() => document.getElementById('resultsArea').scrollIntoView({behavior:'smooth',block:'start'}), 100);
   } catch(e) {
     showToast(e.message);
   } finally {
@@ -953,10 +964,10 @@ function renderCompanies() {
   const visible = activeCat === 'All' ? COMPANIES : COMPANIES.filter(c => c.cat === activeCat);
   const cg = document.getElementById('companiesGrid');
   cg.innerHTML = visible.map(c =>
-    `<div class="company-card${state.activeCompany===c.org?' active':''}" onclick="selectCompany('${c.org}')">
+    `<div class="company-card${state.activeCompany===c.name?' active':''}" data-company-name="${esc(c.name)}" onclick="selectCompany('${c.name.replace(/'/g,"\\'")}')">
       <div class="company-icon">${c.icon}</div>
       <div class="company-name">${c.name}</div>
-      <div class="company-cat">${c.cat}</div>
+      <div class="company-cat">${c.cat}${c.repos.length ? ` · ${c.repos.length} repos` : ''}</div>
     </div>`
   ).join('');
 }
@@ -965,29 +976,40 @@ function setCat(cat) {
   activeCat = cat;
   state.activeCompany = null;
   state.selectedRepos.clear();
-  document.getElementById('repoDrawer').innerHTML = '';
-  document.getElementById('repoDrawer').classList.add('hidden');
-  document.getElementById('companyActionBar').classList.add('hidden');
   renderCompanies();
 }
 
-async function selectCompany(org) {
-  state.activeCompany = org;
+async function selectCompany(name) {
+  // Toggle off if same card clicked again
+  if (state.activeCompany === name) {
+    state.activeCompany = null;
+    state.selectedRepos.clear();
+    renderCompanies();
+    return;
+  }
+
+  state.activeCompany = name;
   state.selectedRepos.clear();
   renderCompanies();
-  const company = COMPANIES.find(c => c.org === org);
-  if (!company) return;
 
-  const drawer = document.getElementById('repoDrawer');
+  const company = COMPANIES.find(c => c.name === name);
+  if (!company) return;
+  const org = company.org;
+
+  const card = document.querySelector(`[data-company-name="${name.replace(/"/g,'&quot;')}"]`);
+  if (!card) return;
+
+  // Create inline drawer with loading state
+  const drawer = document.createElement('div');
+  drawer.className = 'inline-drawer';
   drawer.innerHTML = `<div class="loading-wrap" style="padding:20px 0"><div class="loading-spinner"></div></div>`;
-  drawer.classList.remove('hidden');
-  document.getElementById('companyActionBar').classList.add('hidden');
+  card.after(drawer);
+  setTimeout(() => drawer.scrollIntoView({behavior:'smooth',block:'nearest'}), 50);
 
   try {
     // Start with predefined repos (instant, always works)
     let repos = company.repos.map(r => ({ name: r, stargazers_count: 0 }));
     // If token set, try to fetch live repos (better data, star counts)
-    // Fall back to predefined if live fetch returns empty (e.g. fine-grained token)
     if (state.token) {
       try {
         const live = await fetchOrgRepos(org).then(r => r.slice(0, 20));
@@ -1000,22 +1022,28 @@ async function selectCompany(org) {
     }
 
     drawer.innerHTML = `
-      <div class="repo-drawer">
-        <h4>${company.name} Repositories</h4>
-        <div class="repo-list">
-          ${repos.map(r => {
-            const name = r.name || r;
-            const full = `${org}/${name}`;
-            return `<div class="repo-item" id="ri-${full.replace('/','_')}" onclick="toggleRepo('${full}')">
-              <input type="checkbox" onclick="event.stopPropagation();toggleRepo('${full}')">
-              <span class="repo-item-name">${full}</span>
-              ${r.stargazers_count > 0 ? `<span class="repo-item-stars">★ ${r.stargazers_count}</span>` : ''}
-            </div>`;
-          }).join('')}
-        </div>
+      <div class="inline-drawer-header">
+        <span class="inline-drawer-title">${company.icon} ${company.name} — select repos to search</span>
+        <button class="btn sm" onclick="selectAllCompanyRepos()">Select All</button>
+      </div>
+      <div class="repo-list">
+        ${repos.map(r => {
+          const name = r.name || r;
+          const full = `${org}/${name}`;
+          return `<div class="repo-item" id="ri-${full.replace('/','_')}" onclick="toggleRepo('${full}')">
+            <input type="checkbox" onclick="event.stopPropagation();toggleRepo('${full}')">
+            <span class="repo-item-name">${full}</span>
+            ${r.stargazers_count > 0 ? `<span class="repo-item-stars">★ ${r.stargazers_count}</span>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="inline-drawer-actions">
+        <button class="btn primary" id="inlineCompanySearchBtn" style="display:none" onclick="searchSelectedRepos()">Find Developers →</button>
+        <span id="inlineCompanySelCount" style="font-size:12px;color:var(--t3)">Select repos above</span>
+        <span id="inlineCompanyCost" style="font-size:11px;color:var(--t3);margin-left:auto"></span>
       </div>`;
   } catch(e) {
-    drawer.innerHTML = `<div class="repo-drawer"><p style="color:var(--t3);font-size:13px">${e.message}</p></div>`;
+    drawer.innerHTML = `<div class="inline-drawer-header"><span class="inline-drawer-title" style="color:var(--t3)">${e.message}</span></div>`;
   }
 }
 
@@ -1032,10 +1060,33 @@ function toggleRepo(fullName) {
     el.classList.toggle('selected', state.selectedRepos.has(fullName));
     el.querySelector('input').checked = state.selectedRepos.has(fullName);
   }
-  // Action bar
+  // Inline drawer action bar
   const count = state.selectedRepos.size;
-  document.getElementById('selRepoCount').textContent = count;
-  document.getElementById('companyActionBar').classList.toggle('hidden', count === 0);
+  const btn = document.getElementById('inlineCompanySearchBtn');
+  const span = document.getElementById('inlineCompanySelCount');
+  const cost = document.getElementById('inlineCompanyCost');
+  if (btn) btn.style.display = count > 0 ? '' : 'none';
+  if (span) span.textContent = count > 0 ? `${count} repo${count>1?'s':''} selected` : 'Select repos above';
+  if (cost) cost.textContent = count > 0 ? `~${count + (state.token ? 100 : 30)} API calls` : '';
+}
+
+function selectAllCompanyRepos() {
+  const company = COMPANIES.find(c => c.name === state.activeCompany);
+  if (!company) return;
+  document.querySelectorAll('.inline-drawer .repo-item').forEach(el => {
+    const name = el.querySelector('.repo-item-name')?.textContent;
+    if (name && !state.selectedRepos.has(name)) {
+      state.selectedRepos.add(name);
+      el.classList.add('selected');
+      const cb = el.querySelector('input');
+      if (cb) cb.checked = true;
+    }
+  });
+  const count = state.selectedRepos.size;
+  const btn = document.getElementById('inlineCompanySearchBtn');
+  const span = document.getElementById('inlineCompanySelCount');
+  if (btn) btn.style.display = count > 0 ? '' : 'none';
+  if (span) span.textContent = `${count} repo${count>1?'s':''} selected`;
 }
 
 async function searchSelectedRepos() {
@@ -1083,10 +1134,10 @@ function selectProgramType(name) {
   if (!card) return;
 
   const drawer = document.createElement('div');
-  drawer.className = 'program-inline-drawer';
+  drawer.className = 'inline-drawer';
   drawer.innerHTML = `
-    <div class="program-inline-drawer-header">
-      <span class="program-inline-drawer-title">${pt.icon} ${pt.name} — select repos to search</span>
+    <div class="inline-drawer-header">
+      <span class="inline-drawer-title">${pt.icon} ${pt.name} — select repos to search</span>
       <button class="btn sm" onclick="selectAllProgramRepos()">Select All</button>
     </div>
     <div class="repo-list">
@@ -1096,11 +1147,13 @@ function selectProgramType(name) {
           <span class="repo-item-name">${r}</span>
         </div>`).join('')}
     </div>
-    <div class="program-inline-drawer-actions">
+    <div class="inline-drawer-actions">
       <button class="btn primary" id="inlineSearchBtn" style="display:none" onclick="searchProgramRepos()">Find Developers →</button>
       <span id="inlineSelCount" style="font-size:12px;color:var(--t3)">Select repos above</span>
+      <span id="inlineProgramCost" style="font-size:11px;color:var(--t3);margin-left:auto"></span>
     </div>`;
   card.after(drawer);
+  setTimeout(() => drawer.scrollIntoView({behavior:'smooth',block:'nearest'}), 50);
 }
 
 function toggleProgramRepo(fullName) {
@@ -1118,8 +1171,10 @@ function toggleProgramRepo(fullName) {
   const count = state.selectedRepos.size;
   const btn = document.getElementById('inlineSearchBtn');
   const lbl = document.getElementById('inlineSelCount');
+  const cost = document.getElementById('inlineProgramCost');
   if (btn) btn.style.display = count > 0 ? '' : 'none';
   if (lbl) lbl.textContent = count > 0 ? `${count} repo${count>1?'s':''} selected` : 'Select repos above';
+  if (cost) cost.textContent = count > 0 ? `~${count + (state.token ? 100 : 30)} API calls` : '';
 }
 
 function selectAllProgramRepos() {
@@ -1150,7 +1205,7 @@ async function searchProgramRepos() {
 function renderArchetypes() {
   const grid = document.getElementById('archetypesGrid');
   grid.innerHTML = AI_ARCHETYPES.map((a, i) =>
-    `<div class="archetype-card" onclick="searchArchetype(${i})">
+    `<div class="archetype-card${state.activeArchetype===i?' active':''}" data-archetype-idx="${i}" onclick="selectArchetype(${i})">
       <div class="archetype-title">${a.icon} ${a.title}</div>
       <div class="archetype-desc">${a.desc}</div>
       <div style="margin-top:8px;font-size:10px;color:var(--t3)">${a.repos.join(' · ')}</div>
@@ -1158,10 +1213,89 @@ function renderArchetypes() {
   ).join('');
 }
 
-async function searchArchetype(idx) {
+function selectArchetype(idx) {
+  // Toggle off if same card clicked again
+  if (state.activeArchetype === idx) {
+    state.activeArchetype = null;
+    state.selectedRepos.clear();
+    renderArchetypes();
+    return;
+  }
+
+  state.activeArchetype = idx;
+  state.selectedRepos.clear();
+  renderArchetypes();
+
   const a = AI_ARCHETYPES[idx];
-  document.querySelectorAll('.archetype-card').forEach((c,i) => c.classList.toggle('active', i===idx));
-  await runSearch(a.repos, a.title);
+  const card = document.querySelector(`[data-archetype-idx="${idx}"]`);
+  if (!card) return;
+
+  const drawer = document.createElement('div');
+  drawer.className = 'inline-drawer';
+  drawer.innerHTML = `
+    <div class="inline-drawer-header">
+      <span class="inline-drawer-title">${a.icon} ${a.title} — select repos to search</span>
+      <button class="btn sm" onclick="selectAllArchetypeRepos()">Select All</button>
+    </div>
+    <div class="repo-list">
+      ${a.repos.map(r => `
+        <div class="repo-item" id="ari-${r.replace('/','_')}" onclick="toggleArchetypeRepo('${r}')">
+          <input type="checkbox" onclick="event.stopPropagation();toggleArchetypeRepo('${r}')">
+          <span class="repo-item-name">${r}</span>
+        </div>`).join('')}
+    </div>
+    <div class="inline-drawer-actions">
+      <button class="btn primary" id="inlineArchSearchBtn" style="display:none" onclick="searchArchetypeRepos()">Find Developers →</button>
+      <span id="inlineArchSelCount" style="font-size:12px;color:var(--t3)">Select repos above</span>
+      <span id="inlineArchCost" style="font-size:11px;color:var(--t3);margin-left:auto"></span>
+    </div>`;
+  card.after(drawer);
+  setTimeout(() => drawer.scrollIntoView({behavior:'smooth',block:'nearest'}), 50);
+}
+
+function toggleArchetypeRepo(fullName) {
+  if (state.selectedRepos.has(fullName)) {
+    state.selectedRepos.delete(fullName);
+  } else {
+    state.selectedRepos.add(fullName);
+  }
+  const id = `ari-${fullName.replace('/','_')}`;
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.toggle('selected', state.selectedRepos.has(fullName));
+    el.querySelector('input').checked = state.selectedRepos.has(fullName);
+  }
+  const count = state.selectedRepos.size;
+  const btn = document.getElementById('inlineArchSearchBtn');
+  const span = document.getElementById('inlineArchSelCount');
+  const cost = document.getElementById('inlineArchCost');
+  if (btn) btn.style.display = count > 0 ? '' : 'none';
+  if (span) span.textContent = count > 0 ? `${count} repo${count>1?'s':''} selected` : 'Select repos above';
+  if (cost) cost.textContent = count > 0 ? `~${count + (state.token ? 100 : 30)} API calls` : '';
+}
+
+function selectAllArchetypeRepos() {
+  const a = AI_ARCHETYPES[state.activeArchetype];
+  if (!a) return;
+  a.repos.forEach(r => {
+    if (!state.selectedRepos.has(r)) {
+      state.selectedRepos.add(r);
+      const el = document.getElementById(`ari-${r.replace('/','_')}`);
+      if (el) { el.classList.add('selected'); const cb = el.querySelector('input'); if (cb) cb.checked = true; }
+    }
+  });
+  const count = state.selectedRepos.size;
+  const btn = document.getElementById('inlineArchSearchBtn');
+  const span = document.getElementById('inlineArchSelCount');
+  if (btn) btn.style.display = count > 0 ? '' : 'none';
+  if (span) span.textContent = `${count} repo${count>1?'s':''} selected`;
+}
+
+async function searchArchetypeRepos() {
+  const repos = [...state.selectedRepos];
+  if (!repos.length) return;
+  const a = AI_ARCHETYPES[state.activeArchetype];
+  await runSearch(repos, a ? a.title : 'Selected repos');
 }
 
 // ==========================================================================
@@ -1187,8 +1321,47 @@ function applyFilters() {
     return true;
   });
 
+  // Sort
+  const sortBy = document.getElementById('fSort').value;
+  if (sortBy === 'score') state.filtered.sort((a,b) => b.score - a.score);
+  else if (sortBy === 'contributions') state.filtered.sort((a,b) => b.contributions - a.contributions);
+  else if (sortBy === 'recency') state.filtered.sort((a,b) => (a.daysAgo||999) - (b.daysAgo||999));
+  else if (sortBy === 'name') state.filtered.sort((a,b) => a.name.localeCompare(b.name));
+
   document.getElementById('resultCount').textContent = `${state.filtered.length} developer${state.filtered.length !== 1 ? 's' : ''}`;
+  renderSummary();
   renderCards();
+}
+
+function renderSummary() {
+  const el = document.getElementById('resultsSummary');
+  const devs = state.filtered;
+  if (!devs.length) { el.classList.add('hidden'); return; }
+  el.classList.remove('hidden');
+
+  const avgScore = Math.round(devs.reduce((s,d) => s + d.score, 0) / devs.length);
+  const withEmail = devs.filter(d => d.email).length;
+  const emailPct = Math.round(withEmail / devs.length * 100);
+  const active90 = devs.filter(d => d.daysAgo !== null && d.daysAgo <= 90).length;
+  const activePct = Math.round(active90 / devs.length * 100);
+
+  // Top signals
+  const sigCounts = {};
+  devs.forEach(d => d.signals.forEach(s => { sigCounts[s] = (sigCounts[s]||0) + 1; }));
+  const topSigs = Object.entries(sigCounts).sort((a,b) => b[1] - a[1]).slice(0, 3);
+
+  // Top locations
+  const locCounts = {};
+  devs.forEach(d => { if (d.location) { const l = d.location.split(',')[0].trim(); locCounts[l] = (locCounts[l]||0) + 1; }});
+  const topLoc = Object.entries(locCounts).sort((a,b) => b[1] - a[1]).slice(0, 2);
+
+  el.innerHTML = `
+    <div class="summary-stat"><span class="sv purple">${avgScore}</span> avg score</div>
+    <div class="summary-stat"><span class="sv green">${emailPct}%</span> have email (${withEmail})</div>
+    <div class="summary-stat"><span class="sv green">${activePct}%</span> active 90d (${active90})</div>
+    ${topSigs.length ? `<div class="summary-stat">Top: ${topSigs.map(([s,c]) => `<span class="badge badge-${s}" style="margin-left:4px">${s}</span>`).join('')}</div>` : ''}
+    ${topLoc.length ? `<div class="summary-stat">📍 ${topLoc.map(([l,c]) => `${esc(l)} (${c})`).join(', ')}</div>` : ''}
+  `;
 }
 
 function renderCards() {
@@ -1474,16 +1647,35 @@ function exportCSV() {
   showToast(`Exported ${devs.length} developers`);
 }
 
+function clearResults() {
+  state.contributors = [];
+  state.filtered = [];
+  state.currentSource = '';
+  document.getElementById('resultsArea').classList.add('hidden');
+  document.getElementById('resultsSummary').classList.add('hidden');
+  document.getElementById('cardsGrid').innerHTML = '';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
 // ==========================================================================
 // UI UTILITIES
 // ==========================================================================
 
 function switchMode(mode) {
   state.mode = mode;
+  // Clear active states from all tabs
+  state.activeCompany = null;
+  state.activeProgramType = null;
+  state.activeArchetype = null;
+  state.selectedRepos.clear();
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
   ['repo','ai','companies','programs'].forEach(m => {
     document.getElementById(`panel-${m}`).classList.toggle('hidden', m !== mode);
   });
+  // Re-render all grids to clear stale drawers
+  renderCompanies();
+  renderArchetypes();
+  renderProgramTypes();
 }
 
 function showResults() { document.getElementById('resultsArea').classList.remove('hidden'); }
@@ -1525,6 +1717,13 @@ function init() {
   // Keyboard shortcuts
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeModal();
+    // Cmd+K / Ctrl+K — focus the repo search input
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      switchMode('repo');
+      const input = document.getElementById('repoInput');
+      if (input) input.focus();
+    }
   });
 }
 
