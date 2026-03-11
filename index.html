@@ -1181,6 +1181,7 @@ function renderCard(d) {
         <button class="icon-btn saved-btn${isSaved?' is-saved':''}" title="${isSaved?'Unsave':'Save'}" onclick="toggleSave('${d.login}')">⭐</button>
         <button class="icon-btn" title="Outreach" onclick="openOutreachModal('${d.login}')">✉</button>
         <a class="icon-btn" href="https://github.com/${d.login}" target="_blank" title="GitHub">⧉</a>
+        ${d.twitter ? `<a class="icon-btn" href="https://x.com/${d.twitter}" target="_blank" title="X / Twitter">𝕏</a>` : ''}
         <a class="icon-btn" href="https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(d.name+' '+d.login)}" target="_blank" title="LinkedIn">in</a>
       </div>
     </div>
@@ -1206,6 +1207,7 @@ function openProfileModal(login) {
         <div class="modal-handle">@${dev.login}</div>
         ${dev.company ? `<div style="font-size:12px;color:var(--t3);margin-top:2px">🏢 ${esc(dev.company)}</div>` : ''}
         ${dev.location ? `<div style="font-size:12px;color:var(--t3)">📍 ${esc(dev.location)}</div>` : ''}
+        ${dev.twitter ? `<div style="font-size:12px;color:var(--t3)">𝕏 <a href="https://x.com/${dev.twitter}" target="_blank" style="color:#14F195">@${dev.twitter}</a></div>` : ''}
       </div>
     </div>
     <div class="modal-body">
