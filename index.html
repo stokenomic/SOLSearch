@@ -173,6 +173,22 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
 .program-card.featured .program-icon { font-size:38px; margin-bottom:0; flex-shrink:0; }
 .program-card.featured .program-name { font-size:15px; }
 .program-card.featured .program-count { color:var(--green); font-size:12px; }
+.program-inline-drawer {
+  grid-column:1/-1; background:var(--card2);
+  border:1px solid rgba(153,69,255,0.35); border-radius:var(--radius);
+  padding:16px 20px; animation:slideDown 0.18s ease;
+}
+@keyframes slideDown {
+  from { opacity:0; transform:translateY(-6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.program-inline-drawer .repo-list { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.program-inline-drawer .repo-item { display:flex; align-items:center; gap:6px; padding:5px 10px; border-radius:6px; border:1px solid var(--border); background:var(--card); cursor:pointer; font-size:12px; transition:all 0.15s; }
+.program-inline-drawer .repo-item:hover { border-color:var(--purple); }
+.program-inline-drawer .repo-item.selected { border-color:var(--green); background:rgba(20,241,149,0.07); }
+.program-inline-drawer-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+.program-inline-drawer-title { font-size:14px; font-weight:600; }
+.program-inline-drawer-actions { display:flex; gap:8px; align-items:center; margin-top:14px; }
 
 /* ---- Multi-select action bar ---- */
 .action-bar {
@@ -1025,7 +1041,7 @@ async function searchSelectedRepos() {
 function renderProgramTypes() {
   const grid = document.getElementById('programTypesGrid');
   grid.innerHTML = PROGRAM_TYPES.map(pt =>
-    `<div class="program-card${pt.featured?' featured':''}${state.activeProgramType===pt.name?' active':''}" onclick="selectProgramType('${pt.name.replace(/'/g,"\\'")}')">
+    `<div class="program-card${pt.featured?' featured':''}${state.activeProgramType===pt.name?' active':''}" data-pt-name="${esc(pt.name)}" onclick="selectProgramType('${pt.name.replace(/'/g,"\\'")}')">
       <div class="program-icon">${pt.icon}</div>
       <div>
         <div class="program-name">${pt.name}</div>
@@ -1039,26 +1055,42 @@ function renderProgramTypes() {
 function selectProgramType(name) {
   const pt = PROGRAM_TYPES.find(p => p.name === name);
   if (!pt) return;
+
+  // Toggle off if same card clicked again
+  if (state.activeProgramType === name) {
+    state.activeProgramType = null;
+    state.selectedRepos.clear();
+    renderProgramTypes();
+    return;
+  }
+
   state.activeProgramType = name;
   state.selectedRepos.clear();
   renderProgramTypes();
 
-  const drawer = document.getElementById('programRepoDrawer');
+  // Find the clicked card and inject drawer inline after it
+  const card = document.querySelector(`[data-pt-name="${name.replace(/"/g,'&quot;')}"]`);
+  if (!card) return;
+
+  const drawer = document.createElement('div');
+  drawer.className = 'program-inline-drawer';
   drawer.innerHTML = `
-    <div class="repo-drawer" style="margin-top:12px">
-      <h4>${pt.icon} ${pt.name} — Select repositories to search</h4>
-      <div class="repo-list">
-        ${pt.repos.map(r => `
-          <div class="repo-item" id="pri-${r.replace('/','_')}" onclick="toggleProgramRepo('${r}')">
-            <input type="checkbox" onclick="event.stopPropagation();toggleProgramRepo('${r}')">
-            <span class="repo-item-name">${r}</span>
-          </div>`
-        ).join('')}
-      </div>
+    <div class="program-inline-drawer-header">
+      <span class="program-inline-drawer-title">${pt.icon} ${pt.name} — select repos to search</span>
+      <button class="btn sm" onclick="selectAllProgramRepos()">Select All</button>
+    </div>
+    <div class="repo-list">
+      ${pt.repos.map(r => `
+        <div class="repo-item" id="pri-${r.replace('/','_')}" onclick="toggleProgramRepo('${r}')">
+          <input type="checkbox" onclick="event.stopPropagation();toggleProgramRepo('${r}')">
+          <span class="repo-item-name">${r}</span>
+        </div>`).join('')}
+    </div>
+    <div class="program-inline-drawer-actions">
+      <button class="btn primary" id="inlineSearchBtn" style="display:none" onclick="searchProgramRepos()">Find Developers →</button>
+      <span id="inlineSelCount" style="font-size:12px;color:var(--t3)">Select repos above</span>
     </div>`;
-  drawer.classList.remove('hidden');
-  document.getElementById('programActionBar').classList.add('hidden');
-  document.getElementById('selProgramName').textContent = name;
+  card.after(drawer);
 }
 
 function toggleProgramRepo(fullName) {
@@ -1074,8 +1106,25 @@ function toggleProgramRepo(fullName) {
     el.querySelector('input').checked = state.selectedRepos.has(fullName);
   }
   const count = state.selectedRepos.size;
-  document.getElementById('selProgramRepoCount').textContent = count;
-  document.getElementById('programActionBar').classList.toggle('hidden', count === 0);
+  const btn = document.getElementById('inlineSearchBtn');
+  const lbl = document.getElementById('inlineSelCount');
+  if (btn) btn.style.display = count > 0 ? '' : 'none';
+  if (lbl) lbl.textContent = count > 0 ? `${count} repo${count>1?'s':''} selected` : 'Select repos above';
+}
+
+function selectAllProgramRepos() {
+  const pt = PROGRAM_TYPES.find(p => p.name === state.activeProgramType);
+  if (!pt) return;
+  pt.repos.forEach(r => {
+    state.selectedRepos.add(r);
+    const el = document.getElementById(`pri-${r.replace('/','_')}`);
+    if (el) { el.classList.add('selected'); el.querySelector('input').checked = true; }
+  });
+  const count = state.selectedRepos.size;
+  const btn = document.getElementById('inlineSearchBtn');
+  const lbl = document.getElementById('inlineSelCount');
+  if (btn) btn.style.display = '';
+  if (lbl) lbl.textContent = `${count} repo${count>1?'s':''} selected`;
 }
 
 async function searchProgramRepos() {
