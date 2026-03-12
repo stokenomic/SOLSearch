@@ -164,6 +164,18 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
 .inline-drawer-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
 .inline-drawer-title { font-size:14px; font-weight:600; }
 .inline-drawer-actions { display:flex; gap:8px; align-items:center; margin-top:14px; }
+.inline-results-header {
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  padding-bottom:12px; margin-bottom:14px;
+  border-bottom:1px solid var(--border);
+}
+.inline-results-header .filters-row { margin-left:auto; }
+.inline-results-back {
+  padding:5px 10px; border-radius:7px; font-size:12px; font-weight:500;
+  border:1px solid var(--border); background:var(--card); color:var(--t2);
+  cursor:pointer; transition:all 0.2s; white-space:nowrap;
+}
+.inline-results-back:hover { border-color:var(--purple); color:var(--t1); }
 
 /* ---- Results Summary ---- */
 .results-summary {
@@ -460,49 +472,6 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
     <div class="program-types-grid" id="programTypesGrid"></div>
   </div>
 
-  <!-- Results -->
-  <div id="resultsArea" class="hidden">
-    <div class="results-header">
-      <span class="result-count" id="resultCount">0 developers</span>
-      <span class="result-source" id="resultSource"></span>
-      <button class="btn sm" onclick="clearResults()" title="Clear results">✕ Clear</button>
-      <div class="filters-row">
-        <label class="filter-check"><input type="checkbox" id="fEmail" onchange="applyFilters()"> Has email</label>
-        <label class="filter-check"><input type="checkbox" id="fActive" onchange="applyFilters()"> Active 90d</label>
-        <label class="filter-check"><input type="checkbox" id="fSaved" onchange="applyFilters()"> Saved only</label>
-        <select class="filter-select" id="fLang" onchange="applyFilters()">
-          <option value="">All signals</option>
-          <option value="SOL">SOL</option>
-          <option value="RUST">Rust</option>
-          <option value="ANCHOR">Anchor</option>
-          <option value="SPL">SPL</option>
-          <option value="METAPLEX">Metaplex</option>
-          <option value="VALIDATOR">Validator</option>
-          <option value="DEFI">DeFi</option>
-          <option value="NFT">NFT</option>
-          <option value="ZK">ZK</option>
-          <option value="TS">TypeScript</option>
-          <option value="PYTHON">Python</option>
-          <option value="WEB3">Web3</option>
-        </select>
-        <input class="filter-search" id="fSearch" placeholder="Search name, location…" oninput="applyFilters()"/>
-        <select class="filter-select" id="fSort" onchange="applyFilters()">
-          <option value="score">Sort: Score</option>
-          <option value="contributions">Sort: Commits</option>
-          <option value="recency">Sort: Recent</option>
-          <option value="name">Sort: Name</option>
-        </select>
-        <button class="btn sm" onclick="exportCSV()">↓ CSV</button>
-      </div>
-    </div>
-    <div id="resultsSummary" class="results-summary hidden"></div>
-    <div id="loadingWrap" class="loading-wrap hidden">
-      <div class="loading-spinner"></div>
-      <div>Fetching Solana contributors…</div>
-      <div class="loading-progress" id="loadingProgress"></div>
-    </div>
-    <div id="cardsGrid" class="cards-grid"></div>
-  </div>
 </main>
 
 <!-- Modal -->
@@ -835,6 +804,70 @@ async function fetchOrgRepos(org) {
   return Array.isArray(data) ? data : [];
 }
 
+async function fetchCommitEmail(login, sourceRepo) {
+  const noreply = /@users\.noreply\.github\.com$/;
+  // Try 1: Events API (1 call, covers recent pushes)
+  try {
+    const events = await apiReq(`https://api.github.com/users/${login}/events/public?per_page=10`);
+    if (Array.isArray(events)) {
+      for (const ev of events) {
+        if (ev.type === 'PushEvent' && ev.payload?.commits) {
+          for (const c of ev.payload.commits) {
+            const email = c.author?.email;
+            if (email && !noreply.test(email) && email !== 'noreply@github.com') return email;
+          }
+        }
+      }
+    }
+  } catch(e) { /* fallback */ }
+  // Try 2: Commits API on their source repo
+  if (sourceRepo) {
+    try {
+      const [owner, repo] = sourceRepo.split('/');
+      const commits = await apiReq(`https://api.github.com/repos/${owner}/${repo}/commits?author=${login}&per_page=1`);
+      if (Array.isArray(commits) && commits[0]) {
+        const email = commits[0].commit?.author?.email;
+        if (email && !noreply.test(email) && email !== 'noreply@github.com') return email;
+      }
+    } catch(e) { /* no luck */ }
+  }
+  return null;
+}
+
+async function scanForEmails() {
+  const btn = document.getElementById('emailScanBtn');
+  if (!btn) return;
+  const noEmail = state.contributors.filter(d => !d.email);
+  if (!noEmail.length) { showToast('All developers already have emails'); return; }
+
+  btn.disabled = true;
+  btn.textContent = `Scanning 0/${noEmail.length}…`;
+  let found = 0;
+
+  for (let i = 0; i < noEmail.length; i++) {
+    const dev = noEmail[i];
+    btn.textContent = `Scanning ${i+1}/${noEmail.length}…`;
+    try {
+      const email = await fetchCommitEmail(dev.login, dev.sourceRepo);
+      if (email) {
+        dev.email = email;
+        found++;
+        // Update card in-place
+        const cardEl = document.getElementById(`dc-${dev.login}`);
+        if (cardEl) {
+          const emailSpan = cardEl.querySelector('.card-email');
+          if (emailSpan) emailSpan.textContent = '✉ ' + email;
+        }
+      }
+    } catch(e) { /* skip */ }
+  }
+
+  btn.disabled = false;
+  btn.textContent = `📧 Scan Emails`;
+  showToast(`Found ${found} email${found !== 1 ? 's' : ''} from ${noEmail.length} scanned`);
+  renderSummary();
+}
+
 function updateRateDisplay(remaining) {
   const el = document.getElementById('rateDisplay');
   el.textContent = `API: ${remaining}/h`;
@@ -913,13 +946,53 @@ function daysSince(dateStr) {
 // ==========================================================================
 
 
+function injectInlineResults(drawer, sourceLabel) {
+  drawer.innerHTML = `
+    <div class="inline-results-header">
+      <button class="inline-results-back" onclick="backToRepos()">← Back</button>
+      <span class="result-count" id="resultCount">Loading…</span>
+      <span class="result-source" id="resultSource">${esc(sourceLabel)}</span>
+      <div class="filters-row">
+        <label class="filter-check"><input type="checkbox" id="fEmail" onchange="applyFilters()"> Has email</label>
+        <label class="filter-check"><input type="checkbox" id="fActive" onchange="applyFilters()"> Active 90d</label>
+        <label class="filter-check"><input type="checkbox" id="fSaved" onchange="applyFilters()"> Saved only</label>
+        <select class="filter-select" id="fLang" onchange="applyFilters()">
+          <option value="">All signals</option>
+          <option value="SOL">SOL</option><option value="RUST">Rust</option>
+          <option value="ANCHOR">Anchor</option><option value="SPL">SPL</option>
+          <option value="METAPLEX">Metaplex</option><option value="VALIDATOR">Validator</option>
+          <option value="DEFI">DeFi</option><option value="NFT">NFT</option>
+          <option value="ZK">ZK</option><option value="TS">TypeScript</option>
+          <option value="PYTHON">Python</option><option value="WEB3">Web3</option>
+        </select>
+        <input class="filter-search" id="fSearch" placeholder="Search name, location…" oninput="applyFilters()"/>
+        <select class="filter-select" id="fSort" onchange="applyFilters()">
+          <option value="score">Sort: Score</option>
+          <option value="contributions">Sort: Commits</option>
+          <option value="recency">Sort: Recent</option>
+          <option value="name">Sort: Name</option>
+        </select>
+        <button class="btn sm" onclick="exportCSV()">↓ CSV</button>
+        <button class="btn sm" id="emailScanBtn" onclick="scanForEmails()">📧 Scan Emails</button>
+      </div>
+    </div>
+    <div id="resultsSummary" class="results-summary hidden"></div>
+    <div id="loadingWrap" class="loading-wrap">
+      <div class="loading-spinner"></div>
+      <div>Fetching Solana contributors…</div>
+      <div class="loading-progress" id="loadingProgress"></div>
+    </div>
+    <div id="cardsGrid" class="cards-grid hidden"></div>`;
+}
+
 async function runSearch(repoPaths, sourceLabel) {
-  showResults();
-  showLoading(true);
+  const drawer = document.querySelector('.inline-drawer');
+  if (!drawer) return;
+
+  injectInlineResults(drawer, sourceLabel);
   state.contributors = [];
   state.filtered = [];
   state.currentSource = sourceLabel;
-  document.getElementById('resultSource').textContent = sourceLabel;
 
   const contribMap = {};
 
@@ -983,7 +1056,7 @@ async function runSearch(repoPaths, sourceLabel) {
 
     state.contributors.sort((a,b) => b.score - a.score);
     applyFilters();
-    setTimeout(() => document.getElementById('resultsArea').scrollIntoView({behavior:'smooth',block:'start'}), 100);
+    setTimeout(() => drawer.scrollIntoView({behavior:'smooth',block:'start'}), 100);
   } catch(e) {
     showToast(e.message);
   } finally {
@@ -1252,11 +1325,17 @@ async function searchProgramRepos() {
 // ==========================================================================
 
 function applyFilters() {
-  const hasEmail = document.getElementById('fEmail').checked;
-  const active   = document.getElementById('fActive').checked;
-  const saved    = document.getElementById('fSaved').checked;
-  const lang     = document.getElementById('fLang').value;
-  const q        = document.getElementById('fSearch').value.toLowerCase();
+  const fEmail = document.getElementById('fEmail');
+  const fActive = document.getElementById('fActive');
+  const fSaved = document.getElementById('fSaved');
+  const fLang = document.getElementById('fLang');
+  const fSearch = document.getElementById('fSearch');
+  if (!fEmail) return;
+  const hasEmail = fEmail.checked;
+  const active   = fActive.checked;
+  const saved    = fSaved.checked;
+  const lang     = fLang.value;
+  const q        = fSearch.value.toLowerCase();
 
   state.filtered = state.contributors.filter(d => {
     if (hasEmail && !d.email) return false;
@@ -1284,6 +1363,7 @@ function applyFilters() {
 
 function renderSummary() {
   const el = document.getElementById('resultsSummary');
+  if (!el) return;
   const devs = state.filtered;
   if (!devs.length) { el.classList.add('hidden'); return; }
   el.classList.remove('hidden');
@@ -1315,6 +1395,7 @@ function renderSummary() {
 
 function renderCards() {
   const grid = document.getElementById('cardsGrid');
+  if (!grid) return;
   if (!state.filtered.length) {
     grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
       <div class="empty-icon">◎</div>
@@ -1746,10 +1827,19 @@ function clearResults() {
   state.contributors = [];
   state.filtered = [];
   state.currentSource = '';
-  document.getElementById('resultsArea').classList.add('hidden');
-  document.getElementById('resultsSummary').classList.add('hidden');
-  document.getElementById('cardsGrid').innerHTML = '';
-  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function backToRepos() {
+  clearResults();
+  if (state.activeCompany) {
+    const name = state.activeCompany;
+    state.activeCompany = null; // clear so selectCompany doesn't toggle off
+    selectCompany(name);
+  } else if (state.activeProgramType) {
+    const name = state.activeProgramType;
+    state.activeProgramType = null;
+    selectProgramType(name);
+  }
 }
 
 // ==========================================================================
@@ -1761,6 +1851,7 @@ function switchMode(mode) {
   state.activeCompany = null;
   state.activeProgramType = null;
   state.selectedRepos.clear();
+  clearResults();
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
   ['companies','programs'].forEach(m => {
     document.getElementById(`panel-${m}`).classList.toggle('hidden', m !== mode);
@@ -1769,18 +1860,19 @@ function switchMode(mode) {
   renderProgramTypes();
 }
 
-function showResults() { document.getElementById('resultsArea').classList.remove('hidden'); }
-
 function showLoading(on) {
-  document.getElementById('loadingWrap').classList.toggle('hidden', !on);
-  document.getElementById('cardsGrid').classList.toggle('hidden', on);
+  const lw = document.getElementById('loadingWrap');
+  const cg = document.getElementById('cardsGrid');
+  const rc = document.getElementById('resultCount');
+  if (lw) lw.classList.toggle('hidden', !on);
+  if (cg) cg.classList.toggle('hidden', on);
   if (on) {
-    document.getElementById('cardsGrid').innerHTML = '';
-    document.getElementById('resultCount').textContent = 'Loading…';
+    if (cg) cg.innerHTML = '';
+    if (rc) rc.textContent = 'Loading…';
   }
 }
 
-function setProgress(msg) { document.getElementById('loadingProgress').textContent = msg; }
+function setProgress(msg) { const el = document.getElementById('loadingProgress'); if (el) el.textContent = msg; }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
