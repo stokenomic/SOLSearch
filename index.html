@@ -465,7 +465,7 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
     <p class="section-label">Developers with recent commits across top Solana repositories</p>
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
       <button class="btn primary" onclick="searchRecentBuilders()">Find Recent Devs</button>
-      <span style="font-size:12px;color:var(--t3)" id="recentCost">Scans 15 key repos · ~115 API calls · best with token</span>
+      <span style="font-size:12px;color:var(--t3)" id="recentCost">Scans 19 key repos · ~145 API calls · best with token</span>
     </div>
   </div>
 
@@ -559,6 +559,9 @@ const RECENT_BUILDER_REPOS = [
   'jito-foundation/jito-solana','marinade-finance/liquid-staking-program',
   'mrgnlabs/marginfi-v2-ui','Lightprotocol/light-protocol',
   'magicblock-labs/ephemeral-rollups-spl',
+  // DePIN + Infra additions
+  'helium/helium-program-library','rpcpool/yellowstone-grpc',
+  'solana-developers/program-examples','nosana-ci/nosana-programs',
 ];
 
 const COMPANIES = [
@@ -607,8 +610,18 @@ const COMPANIES = [
   { name:"Squads Protocol",  org:"Squads-Protocol",          cat:"Infrastructure", icon:"🔐", repos:["v4","squads-mpl","smart-account-program"] },
   { name:"QuickNode",        org:"quiknode-labs",            cat:"Infrastructure", icon:"⚡",  repos:["qn-guide-examples"] },
   { name:"Chainlink",        org:"smartcontractkit",         cat:"Infrastructure", icon:"🔗", repos:["chainlink"] },
+  { name:"DoubleZero",       org:"doublezerofoundation",     cat:"Infrastructure", icon:"🌐", repos:["doublezero-solana","doublezero-offchain","network-shapley-rs"] },
+  { name:"Triton (rpcpool)", org:"rpcpool",                  cat:"Infrastructure", icon:"🔺", repos:["yellowstone-grpc","yellowstone-vixen","yellowstone-faithful","solana-rpc-ansible"] },
+  { name:"Solana Developers",org:"solana-developers",        cat:"Infrastructure", icon:"📚", repos:["program-examples","solana-cookbook","developer-bootcamp-2024"] },
   { name:"Jump Crypto",      org:"jump-crypto",              cat:"Infrastructure", icon:"🦘", repos:[] },
   { name:"Syndica",          org:"syndica-io",               cat:"Infrastructure", icon:"📡", repos:[] },
+  // DePIN
+  { name:"Helium",           org:"helium",                   cat:"DePIN",          icon:"📡", repos:["helium-program-library","oracles","gateway-rs","helium-wallet-rs"] },
+  { name:"Render Network",   org:"rendernetwork",            cat:"DePIN",          icon:"🖥", repos:["RNPs"] },
+  { name:"io.net",           org:"ionet-official",           cat:"DePIN",          icon:"🧠", repos:["io_launch_binaries","io-net-official-setup-script"] },
+  { name:"Hivemapper",       org:"hivemapper",               cat:"DePIN",          icon:"🗺", repos:["odc-api","hivemapper-scout","hive-py"] },
+  { name:"Nosana",           org:"nosana-ci",                cat:"DePIN",          icon:"🔄", repos:["nosana-programs","nosana-cli","nosana-kit"] },
+  { name:"GenesysGo / Shadow", org:"GenesysGo",             cat:"DePIN",          icon:"💾", repos:["shadow-drive","shadow-drive-rust","shadow-drive-cli","shadow-nft-standard"] },
   // Gaming
   { name:"MagicBlock",       org:"magicblock-labs",          cat:"Gaming",         icon:"🎮", repos:["bolt","Solana.Unity-SDK","ephemeral-rollups-sdk","delegation-program"] },
   // Wallet
@@ -625,6 +638,12 @@ const COMPANIES = [
   { name:"Rate-X",           org:"ratex-protocol",           cat:"DeFi",           icon:"📉", repos:[] },
   { name:"Exponent Finance", org:"exponent-fi",              cat:"DeFi",           icon:"🧮", repos:[] },
   { name:"Magic Eden",       org:"magiceden-oss",            cat:"NFT",            icon:"🪄", repos:[] },
+  { name:"Tensor",           org:"tensor-foundation",        cat:"NFT",            icon:"📐", repos:["marketplace","tensorswap-sdk","toolkit","smart-rpc"] },
+  // DeFi (additional)
+  { name:"Parcl",            org:"ParclFinance",             cat:"DeFi",           icon:"🏠", repos:["v3-sdk-ts","v3-keepers-ts"] },
+  { name:"Lifinity",         org:"Lifinity-Labs",            cat:"DeFi",           icon:"♾",  repos:["flare-staking","custom-oracle"] },
+  // Consumer
+  { name:"Audius",           org:"AudiusProject",            cat:"Consumer",       icon:"🎵", repos:["apps","hedgehog","fetch-nft"] },
 ];
 
 const AI_ARCHETYPES = [
@@ -677,6 +696,11 @@ const PROGRAM_TYPES = [
       // New ecosystem additions
       "MeteoraAg/dlmm-sdk","Squads-Protocol/v4",
       "streamflow-finance/js-sdk","neonlabsorg/neon-evm",
+      // DePIN / Infra additions
+      "helium/helium-program-library","rpcpool/yellowstone-grpc",
+      "nosana-ci/nosana-programs","GenesysGo/shadow-drive",
+      "solana-developers/program-examples","tensor-foundation/marketplace",
+      "AudiusProject/apps",
   ]},
   { name:"DEX / AMM", icon:"🔄", desc:"Decentralized exchanges and automated market makers",
     repos:["orca-so/whirlpools","raydium-io/raydium-clmm","raydium-io/raydium-amm","raydium-io/raydium-cp-swap","openbook-dex/openbook-v2","openbook-dex/openbook-ts","Ellipsis-Labs/phoenix-v1","Ellipsis-Labs/phoenix-sdk","project-serum/serum-dex","MeteoraAg/dynamic-bonding-curve","MeteoraAg/dlmm-sdk","MeteoraAg/damm-v2"] },
@@ -728,6 +752,8 @@ const PROGRAM_TYPES = [
     repos:["civicteam/solana-attestation-service","Bonfida/solana-name-service-guide","dialectlabs/blinks","dialectlabs/actions"] },
   { name:"EVM Compatibility", icon:"🟢", desc:"EVM emulation and Ethereum compatibility layers on Solana",
     repos:["neonlabsorg/neon-evm","neonlabsorg/neon-proxy.py"] },
+  { name:"DePIN", icon:"📡", desc:"Decentralized physical infrastructure — wireless, compute, storage, mapping",
+    repos:["helium/helium-program-library","helium/oracles","helium/gateway-rs","nosana-ci/nosana-programs","nosana-ci/nosana-cli","GenesysGo/shadow-drive","GenesysGo/shadow-drive-rust","hivemapper/odc-api","rendernetwork/RNPs"] },
 ];
 
 const SIGNAL_KEYWORDS = {
@@ -753,6 +779,8 @@ const SOL_COMPANY_NAMES = [
   "neon","tiplink","sphere","coinflow","moonpay","pump","moonshot","axiom","cube",
   "ratex","exponent","dflow","syndica","quicknode","chainlink","crossmint","metadao",
   "loopscale","step","magiceden","igneous","ellipsis","blockworks","cardinal",
+  "helium","render","ionet","io.net","hivemapper","nosana","genesysgo","shadow",
+  "doublezero","triton","rpcpool","yellowstone","parcl","lifinity","audius",
 ];
 
 const SIGNAL_DESCRIPTIONS = {
@@ -1034,7 +1062,7 @@ async function runSearch(repoPaths, sourceLabel) {
 // COMPANIES MODE
 // ==========================================================================
 
-const CATS = ['All','Foundation','DeFi','NFT','Infrastructure','Tooling','Gaming','Wallet','Governance','Payments'];
+const CATS = ['All','Foundation','DeFi','NFT','Infrastructure','DePIN','Tooling','Gaming','Wallet','Consumer','Governance','Payments'];
 let activeCat = 'All';
 
 function renderCompanies() {
