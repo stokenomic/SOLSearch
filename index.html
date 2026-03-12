@@ -95,16 +95,6 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
 
 /* ---- AI Archetypes ---- */
 .section-label { font-size:12px; color:var(--t3); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.08em; }
-.archetypes-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; }
-.archetype-card {
-  padding:14px 16px; border-radius:var(--radius); background:var(--card);
-  border:1px solid var(--border); cursor:pointer; transition:all 0.2s;
-}
-.archetype-card:hover { border-color:var(--purple); background:var(--card2); transform:translateY(-2px); }
-.archetype-card.active { border-color:var(--green); background:rgba(20,241,149,0.05); }
-.archetype-title { font-size:13px; font-weight:600; margin-bottom:4px; }
-.archetype-desc { font-size:11px; color:var(--t3); line-height:1.4; }
-
 /* ---- Companies ---- */
 .cat-filters { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
 .cat-chip {
@@ -409,7 +399,6 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
   .tab { padding:7px 12px; font-size:12px; flex:1; text-align:center; }
   .search-row { flex-direction:column; }
   .search-row .btn { width:100%; }
-  .archetypes-grid { grid-template-columns:1fr; }
   .companies-grid { grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); }
   .program-types-grid { grid-template-columns:1fr; }
   .cards-grid { grid-template-columns:1fr; }
@@ -454,29 +443,12 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
 
 <main>
   <div class="mode-tabs">
-    <button class="tab active" data-mode="recent" onclick="switchMode('recent')">🔥 Recent Devs</button>
-    <button class="tab" data-mode="ai" onclick="switchMode('ai')">🤖 AI Discovery</button>
-    <button class="tab" data-mode="companies" onclick="switchMode('companies')">🏢 Companies</button>
+    <button class="tab active" data-mode="companies" onclick="switchMode('companies')">🏢 Companies</button>
     <button class="tab" data-mode="programs" onclick="switchMode('programs')">⚡ Program Types</button>
   </div>
 
-  <!-- Recent Devs -->
-  <div class="panel" id="panel-recent">
-    <p class="section-label">Developers with recent commits across top Solana repositories</p>
-    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <button class="btn primary" onclick="searchRecentBuilders()">Find Recent Devs</button>
-      <span style="font-size:12px;color:var(--t3)" id="recentCost">Scans 19 key repos · ~145 API calls · best with token</span>
-    </div>
-  </div>
-
-  <!-- AI Discovery -->
-  <div class="panel hidden" id="panel-ai">
-    <p class="section-label">Select a developer archetype to search pre-mapped Solana repositories</p>
-    <div class="archetypes-grid" id="archetypesGrid"></div>
-  </div>
-
   <!-- Companies -->
-  <div class="panel hidden" id="panel-companies">
+  <div class="panel" id="panel-companies">
     <p class="section-label">Browse Solana ecosystem companies and their repositories</p>
     <div class="cat-filters" id="catFilters"></div>
     <div class="companies-grid" id="companiesGrid"></div>
@@ -549,20 +521,6 @@ main { max-width:1300px; margin:0 auto; padding:24px 20px; position:relative; z-
 // ==========================================================================
 // DATA
 // ==========================================================================
-
-// Curated high-signal repos for "Recent Builders" — kept small to manage API cost
-const RECENT_BUILDER_REPOS = [
-  'solana-labs/solana','anza-xyz/agave','coral-xyz/anchor',
-  'solana-labs/solana-program-library','jup-ag/terminal',
-  'drift-labs/protocol-v2','orca-so/whirlpools','raydium-io/raydium-clmm',
-  'metaplex-foundation/metaplex-program-library','helius-labs/yellowstone-grpc',
-  'jito-foundation/jito-solana','marinade-finance/liquid-staking-program',
-  'mrgnlabs/marginfi-v2-ui','Lightprotocol/light-protocol',
-  'magicblock-labs/ephemeral-rollups-spl',
-  // DePIN + Infra additions
-  'helium/helium-program-library','rpcpool/yellowstone-grpc',
-  'solana-developers/program-examples','nosana-ci/nosana-programs',
-];
 
 const COMPANIES = [
   // Foundation
@@ -644,17 +602,6 @@ const COMPANIES = [
   { name:"Lifinity",         org:"Lifinity-Labs",            cat:"DeFi",           icon:"♾",  repos:["flare-staking","custom-oracle"] },
   // Consumer
   { name:"Audius",           org:"AudiusProject",            cat:"Consumer",       icon:"🎵", repos:["apps","hedgehog","fetch-nft"] },
-];
-
-const AI_ARCHETYPES = [
-  { title:"Solana Core / Validator",   icon:"⚡", desc:"Runtime, consensus, and validator client engineers", repos:["solana-labs/solana","anza-xyz/agave"] },
-  { title:"Anchor Program Dev",        icon:"⚓", desc:"Rust/Anchor on-chain program developers", repos:["coral-xyz/anchor","solana-labs/solana-program-library"] },
-  { title:"DeFi Protocol Engineer",    icon:"📈", desc:"DEX, lending, and yield protocol builders", repos:["orca-so/whirlpools","drift-labs/protocol-v2","jup-ag/terminal"] },
-  { title:"NFT / Metaplex Developer",  icon:"🎨", desc:"NFT standards, minting, and marketplace developers", repos:["metaplex-foundation/metaplex-program-library","metaplex-foundation/mpl-token-metadata"] },
-  { title:"Solana Frontend Dev",       icon:"🖥", desc:"TypeScript/React dApp and wallet-adapter developers", repos:["solana-labs/wallet-adapter","solana-labs/solana-web3.js"] },
-  { title:"Infrastructure / Tooling",  icon:"🔧", desc:"RPC, indexers, oracles, and dev tooling engineers", repos:["helius-labs/helius-rust-sdk","switchboard-xyz/on-demand"] },
-  { title:"ZK / Privacy Researcher",   icon:"🔒", desc:"Zero-knowledge proofs and privacy-preserving protocols", repos:["Lightprotocol/light-protocol"] },
-  { title:"Cross-chain / Bridge",      icon:"🌉", desc:"Cross-chain bridge and interoperability developers", repos:["wormhole-foundation/wormhole","wormhole-foundation/wormhole-sdk-ts"] },
 ];
 
 const PROGRAM_TYPES = [
@@ -841,7 +788,6 @@ const state = {
   selectedRepos: new Set(),
   activeCompany: null,
   activeProgramType: null,
-  activeArchetype: null,
   userCache: {},
   repoCache: {},
   currentSource: '',
@@ -966,19 +912,6 @@ function daysSince(dateStr) {
 // SEARCH LOGIC
 // ==========================================================================
 
-
-async function searchRecentBuilders() {
-  await runSearch(RECENT_BUILDER_REPOS, 'Recent Devs — Top Solana Repos');
-  // Re-sort by recency (most recent first) and filter to active-only
-  state.contributors.sort((a,b) => (a.daysAgo ?? 999) - (b.daysAgo ?? 999));
-  state.filtered = state.contributors.filter(d => d.daysAgo !== null && d.daysAgo <= 90);
-  // Auto-check the active filter
-  document.getElementById('fActive').checked = true;
-  renderSummary();
-  renderCards();
-  // Update sort dropdown to show recency
-  document.getElementById('fSort').value = 'recency';
-}
 
 async function runSearch(repoPaths, sourceLabel) {
   showResults();
@@ -1313,102 +1246,6 @@ async function searchProgramRepos() {
 // ==========================================================================
 // AI DISCOVERY MODE
 // ==========================================================================
-
-function renderArchetypes() {
-  const grid = document.getElementById('archetypesGrid');
-  grid.innerHTML = AI_ARCHETYPES.map((a, i) =>
-    `<div class="archetype-card${state.activeArchetype===i?' active':''}" data-archetype-idx="${i}" onclick="selectArchetype(${i})">
-      <div class="archetype-title">${a.icon} ${a.title}</div>
-      <div class="archetype-desc">${a.desc}</div>
-      <div style="margin-top:8px;font-size:10px;color:var(--t3)">${a.repos.join(' · ')}</div>
-    </div>`
-  ).join('');
-}
-
-function selectArchetype(idx) {
-  // Toggle off if same card clicked again
-  if (state.activeArchetype === idx) {
-    state.activeArchetype = null;
-    state.selectedRepos.clear();
-    renderArchetypes();
-    return;
-  }
-
-  state.activeArchetype = idx;
-  state.selectedRepos.clear();
-  renderArchetypes();
-
-  const a = AI_ARCHETYPES[idx];
-  const card = document.querySelector(`[data-archetype-idx="${idx}"]`);
-  if (!card) return;
-
-  const drawer = document.createElement('div');
-  drawer.className = 'inline-drawer';
-  drawer.innerHTML = `
-    <div class="inline-drawer-header">
-      <span class="inline-drawer-title">${a.icon} ${a.title} — select repos to search</span>
-      <button class="btn sm" onclick="selectAllArchetypeRepos()">Select All</button>
-    </div>
-    <div class="repo-list">
-      ${a.repos.map(r => `
-        <div class="repo-item" id="ari-${r.replace('/','_')}" onclick="toggleArchetypeRepo('${r}')">
-          <input type="checkbox" onclick="event.stopPropagation();toggleArchetypeRepo('${r}')">
-          <span class="repo-item-name">${r}</span>
-        </div>`).join('')}
-    </div>
-    <div class="inline-drawer-actions">
-      <button class="btn primary" id="inlineArchSearchBtn" style="display:none" onclick="searchArchetypeRepos()">Find Developers →</button>
-      <span id="inlineArchSelCount" style="font-size:12px;color:var(--t3)">Select repos above</span>
-      <span id="inlineArchCost" style="font-size:11px;color:var(--t3);margin-left:auto"></span>
-    </div>`;
-  card.after(drawer);
-  setTimeout(() => drawer.scrollIntoView({behavior:'smooth',block:'nearest'}), 50);
-}
-
-function toggleArchetypeRepo(fullName) {
-  if (state.selectedRepos.has(fullName)) {
-    state.selectedRepos.delete(fullName);
-  } else {
-    state.selectedRepos.add(fullName);
-  }
-  const id = `ari-${fullName.replace('/','_')}`;
-  const el = document.getElementById(id);
-  if (el) {
-    el.classList.toggle('selected', state.selectedRepos.has(fullName));
-    el.querySelector('input').checked = state.selectedRepos.has(fullName);
-  }
-  const count = state.selectedRepos.size;
-  const btn = document.getElementById('inlineArchSearchBtn');
-  const span = document.getElementById('inlineArchSelCount');
-  const cost = document.getElementById('inlineArchCost');
-  if (btn) btn.style.display = count > 0 ? '' : 'none';
-  if (span) span.textContent = count > 0 ? `${count} repo${count>1?'s':''} selected` : 'Select repos above';
-  if (cost) cost.textContent = count > 0 ? `~${count + (state.token ? 100 : 30)} API calls` : '';
-}
-
-function selectAllArchetypeRepos() {
-  const a = AI_ARCHETYPES[state.activeArchetype];
-  if (!a) return;
-  a.repos.forEach(r => {
-    if (!state.selectedRepos.has(r)) {
-      state.selectedRepos.add(r);
-      const el = document.getElementById(`ari-${r.replace('/','_')}`);
-      if (el) { el.classList.add('selected'); const cb = el.querySelector('input'); if (cb) cb.checked = true; }
-    }
-  });
-  const count = state.selectedRepos.size;
-  const btn = document.getElementById('inlineArchSearchBtn');
-  const span = document.getElementById('inlineArchSelCount');
-  if (btn) btn.style.display = count > 0 ? '' : 'none';
-  if (span) span.textContent = `${count} repo${count>1?'s':''} selected`;
-}
-
-async function searchArchetypeRepos() {
-  const repos = [...state.selectedRepos];
-  if (!repos.length) return;
-  const a = AI_ARCHETYPES[state.activeArchetype];
-  await runSearch(repos, a ? a.title : 'Selected repos');
-}
 
 // ==========================================================================
 // FILTERS & RENDERING
@@ -1921,18 +1758,14 @@ function clearResults() {
 
 function switchMode(mode) {
   state.mode = mode;
-  // Clear active states from all tabs
   state.activeCompany = null;
   state.activeProgramType = null;
-  state.activeArchetype = null;
   state.selectedRepos.clear();
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
-  ['recent','ai','companies','programs'].forEach(m => {
+  ['companies','programs'].forEach(m => {
     document.getElementById(`panel-${m}`).classList.toggle('hidden', m !== mode);
   });
-  // Re-render all grids to clear stale drawers
   renderCompanies();
-  renderArchetypes();
   renderProgramTypes();
 }
 
@@ -1967,7 +1800,6 @@ function esc(str) {
 // ==========================================================================
 
 function init() {
-  renderArchetypes();
   renderCompanies();
   renderProgramTypes();
   document.getElementById('savedCount').textContent = state.saved.length;
